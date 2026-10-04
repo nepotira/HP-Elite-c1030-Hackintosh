@@ -95,6 +95,24 @@ Preparamos um guia completo dedicado a quem está migrando do Windows para o mac
 ### 2. Desempenho e Fluidez de Animações (EPP 0x40)
 * No `CPUFriendDataProvider.kext`, o parâmetro **EPP (Energy Performance Preference)** foi configurado para **`0x40`** em todos os vetores de frequência. A CPU sobe o clock instantaneamente no início de animações (efeito Gênio, Mission Control e redimensionamento), eliminando engasgos visuais.
 
+---
+
+## ⚡ Por que o sistema pode parecer meio travado no início, mas fica ultra-fluido com o tempo?
+
+### 🗣️ Falando a real (A explicação prática / tática):
+Se você acabou de instalar o macOS ou acabou de reiniciar o notebook e notar que, nos primeiros minutos, algumas animações dão uma leve engasgada ou parecem meio travadas, **não se preocupe e não mexa em nada! Isso é 100% normal e esperado.**
+
+Pode parecer que o sistema está pesado logo no começo, mas **garantimos que ele funcionará muito bem e cada vez melhor com o tempo de uso**. Conforme você vai usando o notebook, abrindo os aplicativos, navegando e usando as janelas, o macOS vai "aquecendo os motores" e guardando tudo na memória rápida. Em pouco tempo, você vai notar que as animações ficam completamente lisas, soltas e o sistema simplesmente voa!
+
+### 🔬 Para quem quer saber os detalhes (A explicação técnica):
+Existem 5 razões reais de engenharia pelas quais o macOS ganha tanta fluidez com o uso contínuo:
+
+1. **Compilação e Cache de Shaders Metal (JIT da GPU):** A placa de vídeo integrada (Intel UHD 630) compila os efeitos visuais, desfoques (*blur*, transparências e janelas) via Metal sob demanda (*Just-In-Time*). Na primeira vez que um efeito aparece na tela, a GPU gasta alguns milissegundos compilando as instruções; logo em seguida, o macOS armazena esse código já compilado em cache rápido no disco (`/var/db/Metal/`). Nas vezes seguintes, a GPU simplesmente lê o cache pronto da memória sem gastar processamento, tornando tudo 100% fluido.
+2. **Serviços Pesados de Indexação Inicial:** Logo após a inicialização, o indexador do **Spotlight (`mds`, `mdworker_shared`)** e rotinas de telemetria do sistema varrem os arquivos para criar o catálogo de buscas rápidas. Essa varredura inicial consome ciclos da CPU e do SSD nos primeiros minutos. Assim que a indexação termina, esses serviços silenciam e a CPU fica 100% livre para a interface.
+3. **Gerenciamento de Memória Dinâmico (Mach VM):** O macOS tem uma política de gerenciamento de memória em que a RAM livre é considerada "desperdiçada". Com os **16 GB LPDDR4** do HP Elite c1030, tudo o que você abre fica pré-carregado em cache quente na memória (*warm cache*). Alternar entre janelas e apps passa a ser instantâneo.
+4. **Pré-aquecimento do WindowServer e buffers do CoreAnimation:** As texturas e matrizes de desenho da interface gráfica já ficam alocadas diretamente no framebuffer de vídeo.
+5. **Ajuste de Clock da CPU com EPP `0x40`:** Como calibramos o `CPUFriend` para EPP `0x40`, o processador Intel Core i7-10610U sobe o clock instantaneamente na menor demanda gráfica. Quando essa resposta imediata de clock se junta aos shaders e apps já em cache na memória, a máquina entrega o ápice de desempenho.
+
 ### 3. Trava de Segurança do Touchscreen (Evita Kernel Panics)
 * O Chromebook possui uma tela sensível ao toque que causa congelamento de interrupção I2C no driver `VoodooI2CHID` ao ser tocada.
 * **A Solução:** 
