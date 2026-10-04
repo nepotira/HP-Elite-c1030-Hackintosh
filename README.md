@@ -34,12 +34,13 @@ Esta é a pasta **EFI definitiva, testada e 100% otimizada** para rodar o macOS 
 | **Monitor Externo USB-C (DisplayPort)** | ✅ Funcionando | Corrigido com `igfxagdc=0` e `disable-agdc` (sem congelamentos) |
 | **Gerenciamento de Energia da CPU** | ✅ Funcionando | `CPUFriend` tunado com EPP `0x40` para resposta instantânea de clock |
 | **Trackpad Multitoque** | ✅ Funcionando | Gestos nativos do macOS via `VoodooI2C` + `VoodooI2CELAN` (I2C0) |
-| **Áudio (Alto-falantes & Fones)** | ✅ Funcionando | Driver SOF (`CmlSOFAudio`). Volume alto nativo via pasta `audio_boost/` |
-| **Microfone Interno** | 🟡 Em testes / Parcial | Reconhecido como DMIC no CmlSOFAudio HAL, porém com sensibilidade baixa |
+| **Áudio (Alto-falantes & Fones)** | ✅ Funcionando | Driver SOF (`CmlSOFAudio`). Volume alto nativo via pacote `audio_boost` |
+| **Microfone Interno** | ✅ Funcionando | Matriz DMIC interna gravando com clareza nos Ajustes e no Gravador de Voz |
 | **Wi-Fi** | ✅ Funcionando | Gerenciado com estabilidade via `itlwm.kext` + app **HeliPort** |
 | **Bluetooth** | ✅ Funcionando | `IntelBluetoothFirmware` + `BlueToolFixup` |
-| **Teclado & Atalhos (Brilho/Volume)** | ✅ Funcionando | Teclas de função e multimídia mapeadas via `SSDT-ChromebookKeys` |
-| **Iluminação do Teclado (Backlight)** | ❌ Não funcional | Controlado pelo Chrome EC via PWM proprietário; em testes pela comunidade |
+| **Teclado & Teclas de Atalho** | ✅ Funcionando | Brilho, volume, multimídia e atalhos mapeados via `SSDT-ChromebookKeys` |
+| **Iluminação do Teclado (Backlight)** | 🟡 Ajustável via Atalhos | Ajuste de 6 níveis via `SSDT-KBBL` com atalhos `F8/F9` ou `Alt(Cmd) + F6/F7` |
+| **Serviços de Localização** | 🟡 Parcial (IP) | itlwm opera via emulação de rede; localização precisa por Wi-Fi BSSID não disponível |
 | **Touchscreen** | ❌ Desativado por Segurança | Bloqueado propositalmente (`SSDT-NoTouch`) para evitar crash/congelamento no I2C |
 | **Indicador de Bateria & Status EC** | ✅ Funcionando | Integrado com `CrosEC.kext` + `SMCBatteryManager` |
 | **SSD NVMe (Western Digital)** | ✅ Funcionando | `NVMeFix.kext` ativo para estabilidade térmica e de energia |
@@ -157,6 +158,48 @@ Assim que o macOS inicializar pela primeira vez usando a EFI, execute estas duas
 
 ---
 
+---
+
+## ⌨️ Mapeamento de Teclas do Chromebook & Backlight
+
+Como o layout de teclado físico do Chromebook HP Elite c1030 difere do teclado padrão da Apple, aplicamos o mapeamento inteligente via **`SSDT-ChromebookKeys.aml`** e **`SSDT-KBBL.aml`** (baseado no trabalho pioneiro de *starsnwind*):
+
+### Linha Superior de Funções (Top Row):
+* **F1:** Voltar no histórico do navegador / sistema
+* **F2:** Avançar no histórico do navegador
+* **F3:** Recarregar página atual (Refresh)
+* **F4:** Alternar modo Tela Cheia (Fullscreen)
+* **F5:** Visão Geral / Mission Control
+* **F6:** Diminuir Brilho da Tela
+* **F7:** Aumentar Brilho da Tela
+* **F8:** Mudo / Diminuir Iluminação do Teclado
+* **F9:** Diminuir Volume / Aumentar Iluminação do Teclado
+* **F10:** Aumentar Volume
+
+### 💡 Iluminação do Teclado (Backlight):
+* O controle de brilho dos LEDs do teclado possui **6 níveis ajustáveis**.
+* **Atalhos para ajustar:**
+  1. `F8` (diminui) / `F9` (aumenta), **OU**
+  2. `Alt` (tecla Command) + `F6` (brilho tela -) ou `F7` (brilho tela +).
+* **Dica de configuração:** Nos *Ajustes do Sistema -> Teclado*, desative a opção *"Ajustar brilho com pouca luz"* para permitir o controle manual livre.
+
+### 🔄 Inversão Command / Option:
+* O patch ACPI já define `Swap command and option = y` para que a tecla física ao lado da barra de espaço atue como **Command (`⌘`)**, mantendo a ergonomia natural do macOS para atalhos (`Cmd+C`, `Cmd+V`, etc.).
+
+---
+
+## 📦 Arquivos para Download (Release v1.0.0 Oficial)
+
+Todos os arquivos necessários para rodar o macOS com 100% dos recursos configurados estão disponíveis diretamente na página de **[Releases](https://github.com/nepotira/HP-Elite-c1030-Hackintosh/releases/tag/v1.0.0)**:
+
+| Arquivo | Tamanho | Descrição | Download Direto |
+| :--- | :---: | :--- | :---: |
+| **`EFI-HP-Elite-c1030-v1.0.0.zip`** | 68.9 MB | Pasta EFI completa (`BOOT` + `OC`) pronta para copiar na partição EFI | [Baixar EFI](https://github.com/nepotira/HP-Elite-c1030-Hackintosh/releases/download/v1.0.0/EFI-HP-Elite-c1030-v1.0.0.zip) |
+| **`Audio-Boost-HP-Elite-c1030.zip`** | 13.9 KB | Instalador do driver de áudio HAL com 100% de volume alto nativo | [Baixar Audio Boost](https://github.com/nepotira/HP-Elite-c1030-Hackintosh/releases/download/v1.0.0/Audio-Boost-HP-Elite-c1030.zip) |
+| **`HeliPort.dmg`** | 8.2 MB | Aplicativo oficial para gerenciamento e conexão do Wi-Fi Intel | [Baixar HeliPort](https://github.com/nepotira/HP-Elite-c1030-Hackintosh/releases/download/v1.0.0/HeliPort.dmg) |
+
+---
+
 ## ⚠️ Gerando seus próprios números de série (SMBIOS)
 
 Por motivos de segurança e para o correto funcionamento dos serviços da Apple (iMessage, FaceTime, iCloud), gere seu próprio número de série antes de logar na sua conta Apple:
@@ -166,9 +209,17 @@ Por motivos de segurança e para o correto funcionamento dos serviços da Apple 
 
 ---
 
-## 🤝 Créditos
-* [Acidanthera](https://github.com/acidanthera) pelo OpenCore, Lilu, WhateverGreen, VirtualSMC, VoodooInput e AppleALC.
-* [MrChromebox](https://mrchromebox.tech/) pelo firmware UEFI Coreboot para Chromebooks.
-* [DexterSLamb](https://github.com/DexterSLamb/CmlSOFAudio) pelo driver `CmlSOFAudio` para Comet Lake SOF.
-* [VoodooI2C Team](https://github.com/VoodooI2C/VoodooI2C) pelo suporte ao trackpad I2C.
-* [OpenIntelWireless](https://github.com/OpenIntelWireless) pelos drivers `itlwm` e `IntelBluetoothFirmware`.
+## 🤝 Créditos e Agradecimentos Especiais
+
+Este projeto é fruto da pesquisa e cooperação ativa da comunidade Hackintosh e ChromeOS. Agradecimentos especiais a:
+
+* **[starsnwind](https://github.com/starsnwind/HP-Elite-C1030---x360-13c-Chromebook-Hackintosh):** Autor do repositório base original para o HP Elite c1030 (Jinlon), pioneiro na criação dos SSDTs de teclado, trackpad e estrutura de ACPI.
+* **Bantryred:** O grande amigo e colaborador que na Issue #7 do repositório do starsnwind descobriu o caminho para rodar o macOS Tahoe, compartilhou sua pasta EFI pelo Google Drive e encontrou o driver `CmlSOFAudio` para toda a comunidade!
+* **[DexterSLamb](https://github.com/DexterSLamb/CmlSOFAudio):** Pelo desenvolvimento revolucionário do driver `CmlSOFAudio` (Sound Open Firmware) para o chipset Comet Lake cAVS no HP c1030.
+* **[JeoJay127](https://github.com/JeoJay127/OCLP-X):** Pelo projeto e patches do OCLP-X.
+* **[OpenIntelWireless](https://github.com/OpenIntelWireless):** Pelos drivers `itlwm`, `IntelBluetoothFirmware` e o aplicativo `HeliPort`.
+* **[LinearMouse Team](https://github.com/linearmouse/linearmouse):** Pelo utilitário open-source essencial para mouse no macOS.
+* **[Acidanthera](https://github.com/acidanthera):** Pelo OpenCore Bootloader, Lilu, WhateverGreen, VirtualSMC, VoodooInput e AppleALC.
+* **[MrChromebox](https://mrchromebox.tech/):** Pelo firmware UEFI Coreboot Full ROM que torna a instalação de sistemas operacionais padrão possível nos Chromebooks.
+* **[VoodooI2C Team](https://github.com/VoodooI2C/VoodooI2C):** Pelo suporte aos gestos do trackpad multitoque.
+* **[CoolStar](https://coolstar.org/):** Pelos trabalhos fundamentais de drivers para Chromebooks.
