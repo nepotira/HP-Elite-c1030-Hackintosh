@@ -19,7 +19,7 @@ Esta é a pasta **EFI definitiva, testada e 100% otimizada** para rodar o macOS 
 | **Gráficos Integrados** | Intel UHD Graphics 630 (Comet Lake GT2, Device ID `0x9B41` / Spoof `0x3EA5`) |
 | **Memória RAM** | 16 GB LPDDR4 2667 MHz (Dual-Channel) |
 | **Armazenamento** | Western Digital PC SN520 128 GB NVMe SSD |
-| **Tela** | 13.5" IPS 1920 × 1280 (proporção 3:2), Touchscreen |
+| **Tela** | 13.5" IPS 1920 × 1280 (proporção 3:2) |
 | **Rede Sem Fio** | Intel Wi-Fi 6 AX201 + Bluetooth 5.2 |
 | **Portas** | 2× USB Type-C (USB 3.2 Gen 1, DisplayPort 1.2 Alt Mode, Power Delivery) + 1× USB-A |
 | **Firmware** | Coreboot / MrChromebox Full ROM UEFI |
@@ -30,18 +30,59 @@ Esta é a pasta **EFI definitiva, testada e 100% otimizada** para rodar o macOS 
 
 | Recurso | Status | Observações |
 | :--- | :---: | :--- |
-| **Aceleração Gráfica Metal 3** | ✅ Funcionando | Intel UHD 630 com aceleração completa e animações fluidas |
-| **Monitor Externo USB-C (DisplayPort)** | ✅ Funcionando | Corrigido com `igfxagdc=0` e `disable-agdc` (sem congelamento/freeze) |
+| **Aceleração Gráfica Metal 3** | ✅ Funcionando | Intel UHD 630 com aceleração completa, transparências e animações fluidas |
+| **Monitor Externo USB-C (DisplayPort)** | ✅ Funcionando | Corrigido com `igfxagdc=0` e `disable-agdc` (sem congelamentos) |
 | **Gerenciamento de Energia da CPU** | ✅ Funcionando | `CPUFriend` tunado com EPP `0x40` para resposta instantânea de clock |
-| **Proteção contra crash no Touchscreen** | ✅ Funcionando | Patch ACPI duplo de 14 bytes + `SSDT-NoTouch` bloqueando travamento |
 | **Trackpad Multitoque** | ✅ Funcionando | Gestos nativos do macOS via `VoodooI2C` + `VoodooI2CELAN` (I2C0) |
-| **Áudio (Falantes, Fone, Microfone)** | ✅ Funcionando | Implementado via driver Sound Open Firmware (`CmlSOFAudio.kext`) |
-| **Wi-Fi** | ✅ Funcionando | Gerenciado via `itlwm.kext` + aplicativo **HeliPort** |
+| **Áudio (Alto-falantes & Fones)** | ✅ Funcionando | Driver SOF (`CmlSOFAudio`). Volume alto nativo via pasta `audio_boost/` |
+| **Microfone Interno** | 🟡 Em testes / Parcial | Reconhecido como DMIC no CmlSOFAudio HAL, porém com sensibilidade baixa |
+| **Wi-Fi** | ✅ Funcionando | Gerenciado com estabilidade via `itlwm.kext` + app **HeliPort** |
 | **Bluetooth** | ✅ Funcionando | `IntelBluetoothFirmware` + `BlueToolFixup` |
-| **Teclado & Teclas Especiais** | ✅ Funcionando | Brilho da tela, volume e layout mapeados via `SSDT-ChromebookKeys` |
+| **Teclado & Atalhos (Brilho/Volume)** | ✅ Funcionando | Teclas de função e multimídia mapeadas via `SSDT-ChromebookKeys` |
+| **Iluminação do Teclado (Backlight)** | ❌ Não funcional | Controlado pelo Chrome EC via PWM proprietário; em testes pela comunidade |
+| **Touchscreen** | ❌ Desativado por Segurança | Bloqueado propositalmente (`SSDT-NoTouch`) para evitar crash/congelamento no I2C |
 | **Indicador de Bateria & Status EC** | ✅ Funcionando | Integrado com `CrosEC.kext` + `SMCBatteryManager` |
-| **SSD NVMe (Western Digital)** | ✅ Funcionando | `NVMeFix.kext` ativo para evitar gargalos e timeouts de energia |
-| **Sleep / Wake** | ✅ Funcionando | Suspensão e despertar estáveis |
+| **SSD NVMe (Western Digital)** | ✅ Funcionando | `NVMeFix.kext` ativo para estabilidade térmica e de energia |
+| **Sleep / Wake** | ✅ Funcionando | Suspensão e despertar funcionando perfeitamente |
+
+---
+
+## 📶 Como Usar o Wi-Fi com o HeliPort
+
+Como a placa de rede sem fio é uma **Intel Wi-Fi 6 AX201**, a Apple não possui drivers nativos para ela nas versões modernas do macOS. O driver open-source **itlwm** gerencia o hardware da Intel emulando uma interface de alta velocidade, e o aplicativo **HeliPort** fornece o menu visual idêntico ao Wi-Fi nativo da Apple.
+
+### Passo a Passo:
+1. Baixe a versão mais recente do aplicativo [HeliPort](https://github.com/OpenIntelWireless/HeliPort/releases).
+2. Abra o arquivo `.dmg` e arraste o **HeliPort.app** para a sua pasta **Aplicativos** (`/Applications`).
+3. Abra o HeliPort. O ícone de Wi-Fi aparecerá na sua **barra de menus superior** (ao lado do relógio).
+4. Clique no ícone do HeliPort, selecione sua rede Wi-Fi e digite a senha.
+5. Marque a opção para **lembrar a rede** (Auto-Join) para que ele conecte automaticamente ao iniciar.
+6. **Para iniciar sempre com o macOS:**
+   * Vá em `Ajustes do Sistema -> Geral -> Itens de Início`.
+   * Na seção *"Abrir no Início de Sessão"*, clique no `+` e adicione o **HeliPort.app**.
+
+---
+
+## 🔊 Áudio com Volume Alto Nativo (`audio_boost`)
+
+O driver `CmlSOFAudio` padrão limita o ganho de software a 25% para evitar distorções no amplificador. Se você acha o som do notebook baixo, incluímos uma versão calibrada para **100% de ganho nativo (4x mais alto)** sem necessidade de instalar aplicativos de terceiros da App Store.
+
+Para ativar o volume amplificado no macOS:
+1. Abra a pasta `audio_boost` deste repositório no seu Mac.
+2. Abra o Terminal e execute:
+   ```bash
+   cd audio_boost
+   sudo ./instalar_audio_boost.sh
+   ```
+3. O script substituirá o plugin HAL em `/Library/Audio/Plug-Ins/HAL/` e reiniciará o serviço de áudio. Pronto!
+
+---
+
+## 🪟 Dicas para quem vem do Windows (Produtividade & Atalhos)
+
+Preparamos um guia completo dedicado a quem está migrando do Windows para o macOS no Chromebook, ensinando como configurar o **LinearMouse** para iniciar junto com o sistema, como ter o **gerenciamento de janelas com divisão de tela (Snap)**, o **Alt+Tab idêntico ao Windows** e as diferenças de atalhos (`Cmd` vs `Ctrl`):
+
+👉 **[Acesse o Guia de Sobrevivência do Windows no macOS](docs/DICAS_MIGRACAO_WINDOWS.md)**
 
 ---
 
@@ -63,7 +104,7 @@ Esta é a pasta **EFI definitiva, testada e 100% otimizada** para rodar o macOS 
 
 ---
 
-## 📖 Como Usar
+## 📖 Como Usar a EFI
 
 ### Opção 1: Baixar a Release Pronta (Recomendado)
 1. Vá na aba **[Releases](https://github.com/nepotira/HP-Elite-c1030-Hackintosh/releases/latest)** e baixe o arquivo **`EFI-HP-Elite-c1030-v1.0.0.zip`**.
@@ -75,12 +116,6 @@ Esta é a pasta **EFI definitiva, testada e 100% otimizada** para rodar o macOS 
 git clone https://github.com/nepotira/HP-Elite-c1030-Hackintosh.git
 ```
 Copie a pasta `EFI` do repositório para a partição EFI (FAT32).
-
----
-
-### Inicialização e Pós-Instalação:
-1. No menu inicial do OpenCore, pressione a barra de espaço e selecione `Reset NVRAM` para limpar caches residuais.
-2. Inicie o instalador ou o macOS!
 
 ---
 
@@ -96,6 +131,6 @@ Por motivos de segurança e para o correto funcionamento dos serviços da Apple 
 ## 🤝 Créditos
 * [Acidanthera](https://github.com/acidanthera) pelo OpenCore, Lilu, WhateverGreen, VirtualSMC, VoodooInput e AppleALC.
 * [MrChromebox](https://mrchromebox.tech/) pelo firmware UEFI Coreboot para Chromebooks.
+* [DexterSLamb](https://github.com/DexterSLamb/CmlSOFAudio) pelo driver `CmlSOFAudio` para Comet Lake SOF.
 * [VoodooI2C Team](https://github.com/VoodooI2C/VoodooI2C) pelo suporte ao trackpad I2C.
 * [OpenIntelWireless](https://github.com/OpenIntelWireless) pelos drivers `itlwm` e `IntelBluetoothFirmware`.
-* Comunidade Hackintosh pelo suporte ao SOF Audio no Comet Lake.
