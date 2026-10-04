@@ -137,6 +137,26 @@ Copie a pasta `EFI` do repositório para a partição EFI (FAT32).
 
 ---
 
+### 🛠️ Pós-Instalação Obrigatória (Primeiros Passos no macOS)
+
+Assim que o macOS inicializar pela primeira vez usando a EFI, execute estas duas etapas essenciais:
+
+1. **Ativar o Áudio com Volume Alto Nativo (100% de ganho):**
+   O OpenCore carrega a kext no kernel, mas o subsistema Sound Open Firmware (SOF) do Chromebook precisa do plugin HAL dentro do macOS. Abra o Terminal e rode:
+   ```bash
+   cd audio_boost
+   sudo ./instalar_audio_boost.sh
+   ```
+   Isso ativa o som com volume alto e nítido instantaneamente, sem precisar de apps de terceiros.
+
+2. **Conectar ao Wi-Fi com o HeliPort:**
+   Baixe o aplicativo oficial [HeliPort](https://github.com/OpenIntelWireless/HeliPort/releases), arraste para sua pasta **Aplicativos** (`/Applications`), abra-o e conecte na sua rede pelo ícone na barra superior. Lembre-se de adicioná-lo em `Ajustes do Sistema -> Geral -> Itens de Início` para conectar automaticamente ao ligar.
+
+3. **Produtividade & Atalhos (Para quem vem do Windows):**
+   Instale o **LinearMouse**, o **Rectangle** (snap de janelas) e o **AltTab** seguindo o nosso **[Guia de Dicas do Windows no macOS](docs/DICAS_MIGRACAO_WINDOWS.md)**.
+
+---
+
 ## ⚠️ Gerando seus próprios números de série (SMBIOS)
 
 Por motivos de segurança e para o correto funcionamento dos serviços da Apple (iMessage, FaceTime, iCloud), gere seu próprio número de série antes de logar na sua conta Apple:
