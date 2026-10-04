@@ -2,6 +2,7 @@
 
 [![OpenCore](https://img.shields.io/badge/OpenCore-1.0.x-blue.svg)](https://github.com/acidanthera/OpenCorePkg)
 [![macOS](https://img.shields.io/badge/macOS-Sonoma%20%7C%20Sequoia%20%7C%20Tahoe-green.svg)](https://www.apple.com/macos/)
+[![Release](https://img.shields.io/github/v/release/nepotira/HP-Elite-c1030-Hackintosh?color=brightgreen)](https://github.com/nepotira/HP-Elite-c1030-Hackintosh/releases/latest)
 [![Hardware](https://img.shields.io/badge/Board-Jinlon%20(Comet%20Lake)-orange.svg)](https://support.hp.com)
 
 Esta é a pasta **EFI definitiva, testada e 100% otimizada** para rodar o macOS com aceleração gráfica completa, estabilidade total e alto desempenho no **HP Elite c1030 Chromebook** (placa-mãe *Jinlon*), com firmware UEFI **Coreboot (MrChromebox Full ROM)**.
@@ -64,15 +65,22 @@ Esta é a pasta **EFI definitiva, testada e 100% otimizada** para rodar o macOS 
 
 ## 📖 Como Usar
 
-1. **Baixar ou clonar este repositório:**
-   ```bash
-   git clone https://github.com/nepotira/HP-Elite-c1030-Hackintosh.git
-   ```
-2. **Copiar a pasta `EFI`:**
-   Copie a pasta `EFI` inteira para a partição EFI (FAT32) do seu SSD interno ou pendrive de instalação.
-3. **Limpar a NVRAM:**
-   No menu inicial do OpenCore, pressione a barra de espaço e selecione `Reset NVRAM`.
-4. **Iniciar o macOS!**
+### Opção 1: Baixar a Release Pronta (Recomendado)
+1. Vá na aba **[Releases](https://github.com/nepotira/HP-Elite-c1030-Hackintosh/releases/latest)** e baixe o arquivo **`EFI-HP-Elite-c1030-v1.0.0.zip`**.
+2. Extraia o arquivo zip.
+3. Copie a pasta `EFI` para a partição EFI (FAT32) do seu SSD ou pendrive bootável.
+
+### Opção 2: Clonar o Repositório via Git
+```bash
+git clone https://github.com/nepotira/HP-Elite-c1030-Hackintosh.git
+```
+Copie a pasta `EFI` do repositório para a partição EFI (FAT32).
+
+---
+
+### Inicialização e Pós-Instalação:
+1. No menu inicial do OpenCore, pressione a barra de espaço e selecione `Reset NVRAM` para limpar caches residuais.
+2. Inicie o instalador ou o macOS!
 
 ---
 
