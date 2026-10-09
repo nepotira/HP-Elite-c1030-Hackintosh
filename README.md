@@ -33,6 +33,10 @@ Esta é a pasta **EFI definitiva, testada e 100% otimizada** para rodar o macOS 
 | **Aceleração Gráfica Metal 3** | ✅ Funcionando | Intel UHD 630 com aceleração completa, transparências e animações fluidas |
 | **Monitor Externo USB-C (DisplayPort)** | ✅ Funcionando | Corrigido com `igfxagdc=0` e `disable-agdc` (sem congelamentos) |
 | **Gerenciamento de Energia da CPU** | ✅ Funcionando | `CPUFriend` tunado com EPP `0x40` para resposta instantânea de clock |
+| **Reprodução de Vídeo por Hardware** | ✅ Funcionando | Firmware Intel GuC (`igfxfw=2`) ativo; sem congelamentos no YouTube/Fotos |
+| **DRM / Netflix** | ✅ Funcionando | Widevine funcional no Chrome/Brave/Edge via `unfairgva=1` e integridade AMFI |
+| **Câmera Web Interna** | ✅ Funcionando | Reconhecida nativamente no CoreMediaIO, porta `HS06` mapeada via `UTBMap` |
+| **Permissões de Privacidade (TCC)** | ✅ Funcionando | Pop-ups nativos destravados no WhatsApp/apps com AMFIPass (`-amfipassbeta`) |
 | **Trackpad Multitoque** | ✅ Funcionando | Gestos nativos do macOS via `VoodooI2C` + `VoodooI2CELAN` (I2C0) |
 | **Áudio (Alto-falantes & Fones)** | ✅ Funcionando | Driver SOF (`CmlSOFAudio`). Volume alto nativo via pacote `audio_boost` |
 | **Microfone Interno** | ✅ Funcionando | Matriz DMIC interna gravando com clareza nos Ajustes e no Gravador de Voz |
@@ -121,12 +125,21 @@ Existem 5 razões reais de engenharia pelas quais o macOS ganha tanta fluidez co
   2. Patch ACPI renomeando o `_CID` `PNP0C50` para `XNP0C50`.
   3. `SSDT-NoTouch.aml` forçando `_STA = 0` no macOS. A tela de toque fica desativada no macOS com total segurança, mantendo o trackpad 100% funcional.
 
+### 4. Correção Global de Vídeos, Firmware Intel GuC & TCC/DRM (v1.1.0)
+* **O Problema:** A reprodução de vídeos em qualquer player ou navegador (YouTube, Netflix, Chrome, Safari, Fotos, Quick Look) causava congelamento da GPU (`IOAccelContextSubmitDataBuffers`), bloqueando o serviço central `VTDecoderXPCService` e travando a interface. Além disso, a Netflix no Chrome apresentava o erro de DRM `M7702-1003` e o WhatsApp não conseguia solicitar permissões de microfone/câmera.
+* **A Solução:**
+  1. **Intel GuC Firmware (`igfxfw=2`):** Carrega o microcontrolador integrado da GPU Intel UHD 630 para agendamento de vídeo em hardware. Isso reduz o uso de CPU e elimina o travamento de decodificação.
+  2. **Remoção de `forceRenderStandby=0`:** Restaura o gerenciamento correto de energia RC6 da iGPU durante a execução de mídias.
+  3. **Proteção de DRM via `unfairgva=1`:** Desvia requisições de DRM incompatíveis com placas integradas puras, estabilizando decodificadores de streaming.
+  4. **Remoção de `amfi=0x80` + ativação de `-amfipassbeta`:** Restaura a integridade do sistema da Apple via `AMFIPass.kext`, permitindo que o Chrome carregue a biblioteca de DRM Widevine (`libwidevinecdm.dylib`) e liberando as caixas de permissão nativas do TCC para Microfone e Câmera no WhatsApp.
+  5. **Mapeamento USB Interno (`UTBMap.kext`):** Ativado no `config.plist`, mapeando a webcam interna Quanta UVC (`HS06`) como conector interno (`255`), estabilizando energia e pacotes.
+
 ---
 
 ## 📖 Como Usar a EFI
 
 ### Opção 1: Baixar a Release Pronta (Recomendado)
-1. Vá na aba **[Releases](https://github.com/nepotira/HP-Elite-c1030-Hackintosh/releases/latest)** e baixe o arquivo **`EFI-HP-Elite-c1030-v1.0.0.zip`**.
+1. Vá na aba **[Releases](https://github.com/nepotira/HP-Elite-c1030-Hackintosh/releases/latest)** e baixe o arquivo **`EFI-HP-Elite-c1030-v1.1.0.zip`**.
 2. Extraia o arquivo zip.
 3. Copie a pasta `EFI` para a partição EFI (FAT32) do seu SSD ou pendrive bootável.
 
@@ -188,15 +201,15 @@ Como o layout de teclado físico do Chromebook HP Elite c1030 difere do teclado 
 
 ---
 
-## 📦 Arquivos para Download (Release v1.0.0 Oficial)
+## 📦 Arquivos para Download (Release v1.1.0 Oficial)
 
-Todos os arquivos necessários para rodar o macOS com 100% dos recursos configurados estão disponíveis diretamente na página de **[Releases](https://github.com/nepotira/HP-Elite-c1030-Hackintosh/releases/tag/v1.0.0)**:
+Todos os arquivos necessários para rodar o macOS com 100% dos recursos configurados estão disponíveis diretamente na página de **[Releases](https://github.com/nepotira/HP-Elite-c1030-Hackintosh/releases/latest)**:
 
 | Arquivo | Tamanho | Descrição | Download Direto |
 | :--- | :---: | :--- | :---: |
-| **`EFI-HP-Elite-c1030-v1.0.0.zip`** | 68.9 MB | Pasta EFI completa (`BOOT` + `OC`) pronta para copiar na partição EFI | [Baixar EFI](https://github.com/nepotira/HP-Elite-c1030-Hackintosh/releases/download/v1.0.0/EFI-HP-Elite-c1030-v1.0.0.zip) |
-| **`Audio-Boost-HP-Elite-c1030.zip`** | 13.9 KB | Instalador do driver de áudio HAL com 100% de volume alto nativo | [Baixar Audio Boost](https://github.com/nepotira/HP-Elite-c1030-Hackintosh/releases/download/v1.0.0/Audio-Boost-HP-Elite-c1030.zip) |
-| **`HeliPort.dmg`** | 8.2 MB | Aplicativo oficial para gerenciamento e conexão do Wi-Fi Intel | [Baixar HeliPort](https://github.com/nepotira/HP-Elite-c1030-Hackintosh/releases/download/v1.0.0/HeliPort.dmg) |
+| **`EFI-HP-Elite-c1030-v1.1.0.zip`** | 68.9 MB | Pasta EFI completa (`BOOT` + `OC`) pronta para copiar na partição EFI | [Baixar EFI v1.1.0](https://github.com/nepotira/HP-Elite-c1030-Hackintosh/releases/download/v1.1.0/EFI-HP-Elite-c1030-v1.1.0.zip) |
+| **`Audio-Boost-HP-Elite-c1030.zip`** | 13.9 KB | Instalador do driver de áudio HAL com 100% de volume alto nativo | [Baixar Audio Boost](https://github.com/nepotira/HP-Elite-c1030-Hackintosh/releases/download/v1.1.0/Audio-Boost-HP-Elite-c1030.zip) |
+| **`HeliPort.dmg`** | 8.2 MB | Aplicativo oficial para gerenciamento e conexão do Wi-Fi Intel | [Baixar HeliPort](https://github.com/nepotira/HP-Elite-c1030-Hackintosh/releases/download/v1.1.0/HeliPort.dmg) |
 
 ---
 

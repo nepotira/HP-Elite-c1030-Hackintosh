@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+﻿<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
     <dict>
@@ -946,7 +946,7 @@
                     <key>Comment</key>
                     <string>V1.1</string>
                     <key>Enabled</key>
-                    <false />
+                    <true />
                     <key>ExecutablePath</key>
                     <string></string>
                     <key>MaxKernel</key>
@@ -1950,7 +1950,7 @@
                     <key>bluetoothInternalControllerInfo</key>
                     <data>AAAAAAAAAAAAAAAAAAA=</data>
                     <key>boot-args</key>
-                    <string>-lilubetaall -igfxnotelemetryload -igfxblr -igfxblt -igfxmlr -igfxmpc igfxonln=1 -igfxhdmidivs revpatch=sbvmm forceRenderStandby=0 amfi=0x80 -vi2c-force-polling keepsyms=1 igfxagdc=0</string>
+                    <string>-lilubetaall -igfxnotelemetryload -igfxblr -igfxblt -igfxmlr -igfxmpc igfxonln=1 -igfxhdmidivs revpatch=sbvmm -vi2c-force-polling keepsyms=1 igfxagdc=0 igfxfw=2 unfairgva=1 -amfipassbeta</string>
                     <key>csr-active-config</key>
                     <data>AwgAAA==</data>
                     <key>prev-lang:kbd</key>
