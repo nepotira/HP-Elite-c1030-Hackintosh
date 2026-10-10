@@ -44,6 +44,10 @@ Esta é a pasta **EFI definitiva, testada e 100% otimizada** para rodar o macOS 
 | **Touchscreen** | ❌ Desativado por Segurança | Bloqueado propositalmente (`SSDT-NoTouch`) para evitar crash/congelamento no I2C |
 | **Indicador de Bateria & Status EC** | ✅ Funcionando | Integrado com `CrosEC.kext` + `SMCBatteryManager` |
 | **SSD NVMe (Western Digital)** | ✅ Funcionando | `NVMeFix.kext` ativo para estabilidade térmica e de energia |
+| **Reprodução de Vídeos (YouTube/Navegadores)** | ✅ Funcionando | Decodificação por hardware fluida (corrigido com remoção de `forceRenderStandby=0`) |
+| **Streaming com DRM (Netflix/Prime Video)** | ✅ Funcionando | FairPlay nativo 1080p no Safari e Widevine no Chrome (com `-amfipassbeta`) |
+| **Permissões do Sistema (TCC / WhatsApp)** | ✅ Funcionando | Pop-ups nativos de microfone/câmera liberados via `AMFIPass.kext` |
+| **Controles de Jogo (GameSir Nova Lite)** | ✅ Funcionando | Suporte nativo via Bluetooth (Modo Nintendo Switch / Xbox) sem afetar o DRM |
 | **Sleep / Wake** | ✅ Funcionando | Suspensão e despertar funcionando perfeitamente |
 
 ---
@@ -120,6 +124,22 @@ Existem 5 razões reais de engenharia pelas quais o macOS ganha tanta fluidez co
   1. Patch ACPI de 14 bytes renomeando o método `_STA` do touchscreen para `XSTA`.
   2. Patch ACPI renomeando o `_CID` `PNP0C50` para `XNP0C50`.
   3. `SSDT-NoTouch.aml` forçando `_STA = 0` no macOS. A tela de toque fica desativada no macOS com total segurança, mantendo o trackpad 100% funcional.
+
+### 4. Correções de Vídeo por Hardware, Permissões TCC e DRM (v1.1.0)
+* **Destravamento de Vídeos (YouTube/Navegadores):** A remoção do argumento `forceRenderStandby=0` permitiu que a Intel UHD 630 alterne seus estados de energia RC6 durante a reprodução de mídia, eliminando o congelamento silencioso do serviço `VTDecoderXPCService`.
+* **Permissões do Sistema (WhatsApp/Microfone/Câmera):** A remoção da antiga marreta `amfi=0x80` e a transição para o **`AMFIPass.kext`** com o argumento **`-amfipassbeta`** restaurou os pop-ups nativos de autorização do macOS, permitindo que o WhatsApp acesse o microfone normalmente.
+* **Aceleração DRM (Netflix/Prime Video):** Com o AMFI mantido de forma compatível via `AMFIPass`, a biblioteca Widevine do Google Chrome (`libwidevinecdm.dylib`) carrega com validação íntegra, permitindo a reprodução de streamings protegidos por direitos autorais. No Safari, o streaming roda via **Apple FairPlay nativo por hardware**.
+* **Por que NÃO usar o Intel GuC Firmware (`igfxfw=2`):** O firmware Coreboot / MrChromebox não implementa os canais de autenticação proprietários da Intel MEI (*Management Engine*). Tentar forçar o carregamento do GuC via `igfxfw=2` faz o driver `AppleIntelKBLGraphics` entrar em loop de espera infinito (*hardware timeout*), travando o boot na barra da maçã.
+
+### 5. 🎮 Controles de Jogo no macOS (GameSir Nova Lite & xCloud)
+O **GameSir Nova Lite** suporta múltiplos modos de conexão. Para jogar no **xCloud (Xbox Cloud Gaming)** no Google Chrome sem quebrar a segurança ou o DRM do sistema:
+1. **Modo Recomendado: Nintendo Switch via Bluetooth (`Home + B` ou `Home + Y`):**
+   * Ligue o controle na combinação do modo Switch e emparelhe via Bluetooth no macOS. O sistema reconhece o controle nativamente pelo framework Apple Game Controller (`GCController`), com suporte a todos os botões, analógicos e gatilhos no Chrome sem instalar drivers!
+2. **Modo Xbox Wireless Controller:** Emparelhe no modo Bluetooth padrão de Xbox.
+3. **⚠️ Atenção sobre o boot-arg `amfi_get_out_of_my_way=1`:**
+   * Se for utilizado o argumento `amfi_get_out_of_my_way=1` para rodar gambiarras ou pontes não assinadas de XInput, o macOS desativa a validação de bibliotecas (*Library Validation*).
+   * **Consequência:** Isso impede o módulo Widevine do Google Chrome de carregar, **quebrando a reprodução da Netflix e outros streamings protegidos por DRM**.
+   * Ao utilizar os modos nativos de Bluetooth do controle, a integridade do sistema permanece ativa, o controle funciona no xCloud e a Netflix continua tocando perfeitamente!
 
 ---
 
@@ -206,6 +226,26 @@ Por motivos de segurança e para o correto funcionamento dos serviços da Apple 
 1. Baixe o [GenSMBIOS](https://github.com/corpnewt/GenSMBIOS).
 2. Escolha o modelo **MacBookPro16,2**.
 3. Substitua `MLB`, `SystemSerialNumber` e `SystemUUID` na seção `PlatformInfo -> Generic` do seu `config.plist`.
+
+---
+
+## 📜 Licença, Isenção de Responsabilidade e Linhagem (Fork)
+
+Este projeto é distribuído sob a **[Licença MIT](LICENSE)**.
+
+### 📌 Origem e Linhagem do Projeto (Fork / Derivação):
+* **Repositório Base:** Este projeto é uma evolução direta do repositório pioneiro **[starsnwind/HP-Elite-C1030---x360-13c-Chromebook-Hackintosh](https://github.com/starsnwind/HP-Elite-C1030---x360-13c-Chromebook-Hackintosh)**.
+* **Base do Update macOS Tahoe:** A atualização inicial da EFI para suportar o macOS 26 Tahoe e o uso do driver `CmlSOFAudio` foram disponibilizadas publicamente pelo colaborador **Bantryred** através do Google Drive na [Issue #7 do repositório original](https://github.com/starsnwind/HP-Elite-C1030---x360-13c-Chromebook-Hackintosh/issues/7).
+* **Desenvolvimento e Refinamentos (nepotira):**
+  - Engenharia reversa e criação do ganho nativo de volume 100% no HAL (`audio_boost`).
+  - Calibração de desempenho agressivo via `CPUFriend` (EPP `0x40`).
+  - Otimização do framebuffer de vídeo da Intel UHD 630 e correção de congelamento nas portas USB-C com monitores externos.
+  - Correção de decodificação de vídeo (remoção do deadlock de `forceRenderStandby`).
+  - Remoção do bloqueio de AMFI para restauração das permissões de microfone/câmera e DRM Widevine.
+  - Criação da documentação completa, scripts automatizados e guias de migração.
+
+### ⚖️ Disclaimer Legal:
+macOS, OS X, Apple, MacBook Pro e suas respectivas marcas são propriedades exclusivas da Apple Inc. Este projeto não possui vínculos comerciais, patrocínio ou endosso da Apple Inc. O conteúdo é estritamente educacional, experimental e voltado para computação pessoal. Os componentes de terceiros (OpenCore, kexts) mantêm seus direitos e licenças originais sob custódia de seus respectivos mantenedores.
 
 ---
 
