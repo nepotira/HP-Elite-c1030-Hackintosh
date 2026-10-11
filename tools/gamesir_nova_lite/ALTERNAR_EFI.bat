@@ -26,7 +26,7 @@ echo ===========================================================================
 echo.
 echo Escolha qual perfil de EFI você deseja aplicar no seu SSD (Y:\EFI\OC\config.plist):
 echo.
-echo [1] Ativar EFI PADRÃO ESTÁVEL v1.1.0 (Recomendada / Oficial)
+echo [1] Ativar EFI PADRÃO ESTÁVEL v1.2.0 (Recomendada / Oficial)
 echo     - AMFI compatível (-amfipassbeta)
 echo     - Netflix OK em qualquer navegador (Chrome + Safari)
 echo     - WhatsApp Microfone OK, Câmera OK, YouTube 1080p 60fps OK
@@ -46,8 +46,10 @@ goto MENU
 
 :ATIVAR_PADRAO
 cls
-echo Aplicando perfil PADRÃO ESTÁVEL v1.1.0 na partição Y:\...
-if exist "%~dp0configs\config_padrao_v1.1.0.plist" (
+echo Aplicando perfil PADRÃO ESTÁVEL v1.2.0 na partição Y:\...
+if exist "%~dp0configs\config_padrao_v1.2.0.plist" (
+    copy /Y "%~dp0configs\config_padrao_v1.2.0.plist" "Y:\EFI\OC\config.plist" > nul
+) else if exist "%~dp0configs\config_padrao_v1.1.0.plist" (
     copy /Y "%~dp0configs\config_padrao_v1.1.0.plist" "Y:\EFI\OC\config.plist" > nul
 ) else if exist "C:\Users\nepo\Desktop\config_TESTE_sem_amfi.plist" (
     copy /Y "C:\Users\nepo\Desktop\config_TESTE_sem_amfi.plist" "Y:\EFI\OC\config.plist" > nul
@@ -57,7 +59,7 @@ if exist "%~dp0configs\config_padrao_v1.1.0.plist" (
     goto MENU
 )
 echo.
-echo [SUCESSO] Perfil PADRÃO ESTÁVEL v1.1.0 ativado com sucesso!
+echo [SUCESSO] Perfil PADRÃO ESTÁVEL v1.2.0 ativado com sucesso!
 echo - Netflix, WhatsApp e Áudio funcionando perfeitamente.
 echo Pode reiniciar o computador para entrar no macOS.
 echo.
