@@ -50,7 +50,7 @@ Se você acabou de comprar o Chromebook e ele ainda está com o ChromeOS de fáb
 | **Wi-Fi** | ✅ Funcionando | Gerenciado com estabilidade via `itlwm.kext` + app **HeliPort** |
 | **Bluetooth** | ✅ Funcionando | `IntelBluetoothFirmware` + `BlueToolFixup` |
 | **Teclado & Teclas de Atalho** | ✅ Funcionando | Brilho, volume, multimídia e atalhos mapeados via `SSDT-ChromebookKeys` |
-| **Iluminação do Teclado (Backlight)** | 🟡 Ajustável via Atalhos | Ajuste de 6 níveis via `SSDT-KBBL` com atalhos `F8/F9` ou `Alt(Cmd) + F6/F7` |
+| **Iluminação do Teclado (Backlight)** | ❌ Não funcional | Controle gerenciado pelo ChromeOS EC que não possui driver compatível no macOS |
 | **Serviços de Localização** | 🟡 Parcial (IP) | itlwm opera via emulação de rede; localização precisa por Wi-Fi BSSID não disponível |
 | **Touchscreen** | ❌ Desativado por Segurança | Bloqueado propositalmente (`SSDT-NoTouch`) para evitar crash/congelamento no I2C |
 | **Indicador de Bateria & Status EC** | ✅ Funcionando | Integrado com `CrosEC.kext` + `SMCBatteryManager` |
@@ -199,9 +199,9 @@ Assim que o macOS inicializar pela primeira vez usando a EFI, execute estas duas
 
 ---
 
-## ⌨️ Mapeamento de Teclas do Chromebook & Backlight
+## ⌨️ Mapeamento de Teclas do Chromebook
 
-Como o layout de teclado físico do Chromebook HP Elite c1030 difere do teclado padrão da Apple, aplicamos o mapeamento inteligente via **`SSDT-ChromebookKeys.aml`** e **`SSDT-KBBL.aml`** (baseado no trabalho pioneiro de *starsnwind*):
+Como o layout de teclado físico do Chromebook HP Elite c1030 difere do teclado padrão da Apple, aplicamos o mapeamento inteligente via **`SSDT-ChromebookKeys.aml`**:
 
 ### Linha Superior de Funções (Top Row):
 * **F1:** Voltar no histórico do navegador / sistema
@@ -211,19 +211,15 @@ Como o layout de teclado físico do Chromebook HP Elite c1030 difere do teclado 
 * **F5:** Visão Geral / Mission Control
 * **F6:** Diminuir Brilho da Tela
 * **F7:** Aumentar Brilho da Tela
-* **F8:** Mudo / Diminuir Iluminação do Teclado
-* **F9:** Diminuir Volume / Aumentar Iluminação do Teclado
+* **F8:** Mudo
+* **F9:** Diminuir Volume
 * **F10:** Aumentar Volume
-
-### 💡 Iluminação do Teclado (Backlight):
-* O controle de brilho dos LEDs do teclado possui **6 níveis ajustáveis**.
-* **Atalhos para ajustar:**
-  1. `F8` (diminui) / `F9` (aumenta), **OU**
-  2. `Alt` (tecla Command) + `F6` (brilho tela -) ou `F7` (brilho tela +).
-* **Dica de configuração:** Nos *Ajustes do Sistema -> Teclado*, desative a opção *"Ajustar brilho com pouca luz"* para permitir o controle manual livre.
 
 ### 🔄 Inversão Command / Option:
 * O patch ACPI já define `Swap command and option = y` para que a tecla física ao lado da barra de espaço atue como **Command (`⌘`)**, mantendo a ergonomia natural do macOS para atalhos (`Cmd+C`, `Cmd+V`, etc.).
+
+> [!NOTE]
+> **Sobre a Iluminação do Teclado (Backlight):** Embora o hardware do teclado do HP Elite c1030 tenha LEDs de iluminação, o controle de intensidade é gerenciado exclusivamente pelo firmware do chip **ChromeOS EC (Embedded Controller)** via barramento proprietário. Como não existe um driver de teclado ChromeOS EC para macOS, os LEDs não acendem e não há ajuste de brilho do teclado no macOS.
 
 ---
 
