@@ -26,6 +26,17 @@ Esta é a pasta **EFI definitiva, testada e 100% otimizada** para rodar o macOS 
 
 ---
 
+## 🧭 Acabou de Comprar o HP Elite c1030? (Do Zero ao macOS)
+
+Se você acabou de comprar o Chromebook e ele ainda está com o ChromeOS de fábrica, preparamos um **guia completo do zero**, passo a passo, ensinando como desbloquear a placa com o Coreboot UEFI, a estratégia de instalar o Windows leve (Tiny11) primeiro como base, como configurar o OpenCore e como instalar o macOS:
+
+👉 **[Acesse o Tutorial Completo: Do ChromeOS ao macOS Passo a Passo](docs/GUIA_DO_ZERO_AO_MACOS.md)**
+
+> [!WARNING]
+> **AVISO IMPORTANTE:** O guia inclui os links dos tutoriais oficiais do [MrChromebox.tech](https://mrchromebox.tech/), instruções de segurança de hardware, e dicas sobre como utilizar Inteligência Artificial (Antigravity como Administrador com modelos Gemini Flash no modo High) para ajudar no processo por sua conta e risco. NÃO nos responsabilizamos por quaisquer danos ao seu hardware!
+
+---
+
 ## 🚀 Status dos Recursos
 
 | Recurso | Status | Observações |
