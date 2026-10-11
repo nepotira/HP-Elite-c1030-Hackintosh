@@ -27,7 +27,7 @@ Mantenha o perfil com `amfi_get_out_of_my_way=1` ativo na EFI:
 
 ### Solução 2: A Solução Definitiva (Ambos funcionando no Google Chrome)
 Se você faz questão de assistir à Netflix dentro do próprio Google Chrome:
-1. Mantenha a **EFI Padrão v1.2.0** (sem o argumento `amfi_get_out_of_my_way=1`).
+1. Mantenha a **EFI Padrão v1.1.2** (sem o argumento `amfi_get_out_of_my_way=1`).
 2. Abra o script **`setup_gamesir_dongle.command`** contido nesta pasta dando dois cliques no macOS.
 3. Escolha a **Opção [1]** e selecione o executável da sua ferramenta de controle.
 4. O script aplicará a assinatura digital local (**Ad-Hoc Signing**) e removerá os atributos de quarentena:
@@ -43,7 +43,7 @@ Se você faz questão de assistir à Netflix dentro do próprio Google Chrome:
 Se você está no Windows em dual-boot:
 1. Execute o script **`ALTERNAR_EFI.bat`** como Administrador.
 2. Escolha:
-   * **[1] EFI PADRÃO ESTÁVEL v1.2.0:** Para uso diário, estudos, Netflix no Chrome e reuniões com WhatsApp Microfone.
+   * **[1] EFI PADRÃO ESTÁVEL v1.1.2:** Para uso diário, estudos, Netflix no Chrome e reuniões com WhatsApp Microfone.
    * **[2] EFI COM BYPASS XINPUT:** Para sessões de jogos no xCloud usando o dongle de 2.4 GHz no Chrome.
 3. O script substitui o `config.plist` na partição `Y:\EFI\OC\` instantaneamente.
 
@@ -52,5 +52,5 @@ Se você está no Windows em dual-boot:
 ## 📦 Conteúdo deste Pacote:
 * **`setup_gamesir_dongle.command`**: Script executável do macOS para assinatura ad-hoc e diagnóstico USB.
 * **`ALTERNAR_EFI.bat`**: Script de automação do Windows para troca de perfis de EFI na partição `Y:`.
-* **`configs/config_padrao_v1.2.0.plist`**: Arquivo de configuração padrão oficial (DRM e TCC 100%).
+* **`configs/config_padrao_v1.1.2.plist`**: Arquivo de configuração padrão oficial (DRM e TCC 100%).
 * **`configs/config_gamesir_xinput.plist`**: Arquivo de configuração com `amfi_get_out_of_my_way=1` para testes de dongle.

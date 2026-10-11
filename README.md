@@ -150,7 +150,7 @@ Para quem joga no **Xbox Cloud Gaming (xCloud)** e busca a menor latência poss�
 1. **O Cenário:** O dongle do GameSir opera em modo XInput padrão de fábrica (`Home + X`, LED verde). Navegadores baseados em Chromium no macOS necessitam de uma ponte/driver para mapear dispositivos XInput via USB.
 2. **Como ter GameSir com Dongle E Netflix funcionando ao mesmo tempo:**
    * **Cenário A (Prático e Imediato):** Com o perfil de bypass da EFI (`amfi_get_out_of_my_way=1`), você joga no **Google Chrome com o Dongle USB 2.4 GHz** com resposta imediata. Para assistir à **Netflix**, basta abrir o **Safari**! O Safari não depende do módulo Widevine do Chrome; ele utiliza o decodificador nativo da Apple por hardware (**Apple FairPlay** acelerado pela Intel UHD 630 com `unfairgva=1`), reproduzindo em **1080p Full HD** sem nenhum conflito!
-   * **Cenário B (Tudo no Google Chrome com Assinatura Ad-Hoc):** Se você prefere assistir à Netflix dentro do Chrome, mantenha a EFI Padrão v1.2.0 e utilize o utilitário **`setup_gamesir_dongle.command`** da pasta `tools/gamesir_nova_lite/`. O script assina a ponte de controle localmente (`codesign --force --deep --sign -`), fazendo o macOS confiar no programa com o AMFI ativo!
+   * **Cenário B (Tudo no Google Chrome com Assinatura Ad-Hoc):** Se você prefere assistir à Netflix dentro do Chrome, mantenha a EFI Padrão v1.1.2 e utilize o utilitário **`setup_gamesir_dongle.command`** da pasta `tools/gamesir_nova_lite/`. O script assina a ponte de controle localmente (`codesign --force --deep --sign -`), fazendo o macOS confiar no programa com o AMFI ativo!
    * **Cenário C (Alternador de Perfis de EFI no Windows):** Incluímos o script **`ALTERNAR_EFI.bat`** para quem usa dual-boot com Windows poder alternar entre o perfil Padrão e o perfil XInput com apenas 1 clique.
 3. 👉 **[Acesse o Pacote de Ferramentas e Instruções do GameSir](tools/gamesir_nova_lite/README.md)** na pasta `tools/gamesir_nova_lite/`.
 
@@ -162,7 +162,7 @@ Para quem joga no **Xbox Cloud Gaming (xCloud)** e busca a menor latência poss�
 ## 📖 Como Usar a EFI
 
 ### Opção 1: Baixar a Release Pronta (Recomendado)
-1. Vá na aba **[Releases](https://github.com/nepotira/HP-Elite-c1030-Hackintosh/releases/latest)** e baixe o arquivo **`EFI-HP-Elite-c1030-v1.2.0.zip`**.
+1. Vá na aba **[Releases](https://github.com/nepotira/HP-Elite-c1030-Hackintosh/releases/latest)** e baixe o arquivo **`EFI-HP-Elite-c1030-v1.1.2.zip`**.
 2. Extraia o arquivo zip.
 3. Copie a pasta `EFI` para a partição EFI (FAT32) do seu SSD ou pendrive bootável.
 
@@ -224,16 +224,16 @@ Como o layout de teclado físico do Chromebook HP Elite c1030 difere do teclado 
 
 ---
 
-## 📦 Arquivos para Download (Release v1.2.0 Oficial)
+## 📦 Arquivos para Download (Release v1.1.2 Oficial)
 
-Todos os arquivos necessários para rodar o macOS com 100% dos recursos configurados estão disponíveis diretamente na página de **[Releases](https://github.com/nepotira/HP-Elite-c1030-Hackintosh/releases/tag/v1.2.0)**:
+Todos os arquivos necessários para rodar o macOS com 100% dos recursos configurados estão disponíveis diretamente na página de **[Releases](https://github.com/nepotira/HP-Elite-c1030-Hackintosh/releases/tag/v1.1.2)**:
 
 | Arquivo | Tamanho | Descrição | Download Direto |
 | :--- | :---: | :--- | :---: |
-| **`EFI-HP-Elite-c1030-v1.2.0.zip`** | 68.9 MB | Pasta EFI completa (`BOOT` + `OC`) pronta para copiar na partição EFI | [Baixar EFI](https://github.com/nepotira/HP-Elite-c1030-Hackintosh/releases/download/v1.2.0/EFI-HP-Elite-c1030-v1.2.0.zip) |
-| **`Audio-Boost-HP-Elite-c1030.zip`** | 13.9 KB | Instalador do driver de áudio HAL com 100% de volume alto nativo | [Baixar Audio Boost](https://github.com/nepotira/HP-Elite-c1030-Hackintosh/releases/download/v1.2.0/Audio-Boost-HP-Elite-c1030.zip) |
-| **`GameSir-Nova-Lite-Mac-Tool.zip`** | 28.7 KB | Utilitários, scripts de assinatura Ad-Hoc e alternador de perfil EFI para Dongle USB 2.4 GHz | [Baixar Ferramentas GameSir](https://github.com/nepotira/HP-Elite-c1030-Hackintosh/releases/download/v1.2.0/GameSir-Nova-Lite-Mac-Tool.zip) |
-| **`HeliPort.dmg`** | 8.2 MB | Aplicativo oficial para gerenciamento e conexão do Wi-Fi Intel | [Baixar HeliPort](https://github.com/nepotira/HP-Elite-c1030-Hackintosh/releases/download/v1.2.0/HeliPort.dmg) |
+| **`EFI-HP-Elite-c1030-v1.1.2.zip`** | 68.9 MB | Pasta EFI completa (`BOOT` + `OC`) pronta para copiar na partição EFI | [Baixar EFI](https://github.com/nepotira/HP-Elite-c1030-Hackintosh/releases/download/v1.1.2/EFI-HP-Elite-c1030-v1.1.2.zip) |
+| **`Audio-Boost-HP-Elite-c1030.zip`** | 13.9 KB | Instalador do driver de áudio HAL com 100% de volume alto nativo | [Baixar Audio Boost](https://github.com/nepotira/HP-Elite-c1030-Hackintosh/releases/download/v1.1.2/Audio-Boost-HP-Elite-c1030.zip) |
+| **`GameSir-Nova-Lite-Mac-Tool.zip`** | 28.7 KB | Utilitários, scripts de assinatura Ad-Hoc e alternador de perfil EFI para Dongle USB 2.4 GHz | [Baixar Ferramentas GameSir](https://github.com/nepotira/HP-Elite-c1030-Hackintosh/releases/download/v1.1.2/GameSir-Nova-Lite-Mac-Tool.zip) |
+| **`HeliPort.dmg`** | 8.2 MB | Aplicativo oficial para gerenciamento e conexão do Wi-Fi Intel | [Baixar HeliPort](https://github.com/nepotira/HP-Elite-c1030-Hackintosh/releases/download/v1.1.2/HeliPort.dmg) |
 
 ---
 

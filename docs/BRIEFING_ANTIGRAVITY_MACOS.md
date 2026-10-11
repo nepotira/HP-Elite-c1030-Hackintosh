@@ -13,7 +13,7 @@
 * **Firmware:** Coreboot / MrChromebox Full ROM UEFI
 * **Sistema Operacional:** macOS 15 / 26 (Tahoe / Sonoma)
 * **Repositório Oficial do Projeto no GitHub:** [https://github.com/nepotira/HP-Elite-c1030-Hackintosh](https://github.com/nepotira/HP-Elite-c1030-Hackintosh)
-* **Release Publicada:** v1.2.0 com `EFI-HP-Elite-c1030-v1.2.0.zip`, `Audio-Boost-HP-Elite-c1030.zip`, `GameSir-Nova-Lite-Mac-Tool.zip` e `HeliPort.dmg`.
+* **Release Publicada:** v1.1.2 com `EFI-HP-Elite-c1030-v1.1.2.zip`, `Audio-Boost-HP-Elite-c1030.zip`, `GameSir-Nova-Lite-Mac-Tool.zip` e `HeliPort.dmg`.
 
 ---
 

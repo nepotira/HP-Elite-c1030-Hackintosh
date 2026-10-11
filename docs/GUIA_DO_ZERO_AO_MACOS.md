@@ -85,7 +85,7 @@ Você pode instalar o macOS diretamente, mas a **estratégia que nós adotamos e
 
 ### Por que instalar um Windows leve primeiro?
 * **Facilidade de Manutenção:** No Windows, você pode usar ferramentas gráficas como *Minitool Partition Wizard*, *Diskpart*, *Explorer++* e gerenciar o particionamento do SSD sem estresse.
-* **Uso da IA Antigravity:** Permite que você abra o Antigravity com privilégios de Administrador no Windows para montar a partição EFI oculta (`Y:\EFI`), copiar arquivos da nossa Release v1.2.0 e conferir tudo antes de reiniciar.
+* **Uso da IA Antigravity:** Permite que você abra o Antigravity com privilégios de Administrador no Windows para montar a partição EFI oculta (`Y:\EFI`), copiar arquivos da nossa Release v1.1.2 e conferir tudo antes de reiniciar.
 * **Dual-Boot Permanente:** Você fica com um notebook híbrido, podendo alternar entre macOS e Windows sempre que precisar de algum aplicativo ou jogo específico.
 
 ### O que usamos: Tiny11
@@ -129,7 +129,7 @@ Muitos iniciantes se perguntam: *"O que é esse tal de OpenCore e onde ele fica?
 
 Com o Windows instalado, configurar a EFI com o nosso pacote pronto leva menos de 2 minutos:
 
-1. Baixe o arquivo **`EFI-HP-Elite-c1030-v1.2.0.zip`** na página de **[Releases deste Repositório](https://github.com/nepotira/HP-Elite-c1030-Hackintosh/releases/latest)**.
+1. Baixe o arquivo **`EFI-HP-Elite-c1030-v1.1.2.zip`** na página de **[Releases deste Repositório](https://github.com/nepotira/HP-Elite-c1030-Hackintosh/releases/latest)**.
 2. Extraia o arquivo `.zip` na sua Área de Trabalho.
 3. Abra o **Prompt de Comando (CMD) ou PowerShell como Administrador** e monte a partição EFI oculta na letra `Y:`:
    ```cmd
