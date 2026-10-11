@@ -192,6 +192,9 @@ Assim que o macOS inicializar pela primeira vez usando a EFI, execute estas duas
 3. **Produtividade & Atalhos (Para quem vem do Windows):**
    Instale o **LinearMouse**, o **Rectangle** (snap de janelas) e o **AltTab** seguindo o nosso **[Guia de Dicas do Windows no macOS](docs/DICAS_MIGRACAO_WINDOWS.md)**.
 
+4. **Definir o macOS como Inicialização Padrão no Boot:**
+   Na tela do OpenCore, selecione o **macOS** (com a setinha para a direita), segure a tecla **`Ctrl`** e aperte **`Enter`**. O OpenCore grava a preferência na NVRAM, fazendo o computador acordar sempre no macOS por padrão.
+
 ---
 
 ---

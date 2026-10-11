@@ -93,3 +93,5 @@ A maioria dos atalhos clássicos do Windows utiliza a tecla **Command** (`⌘`) 
    * Se sua memória muscular estiver muito acostumada a apertar a tecla da ponta esquerda para copiar/colar:
    * Vá em `Ajustes do Sistema -> Teclado -> Atalhos de Teclado -> Teclas Modificadoras`.
    * Selecione seu teclado e você pode trocar a função da tecla `Control` para se comportar como `Command`.
+4. **Iniciar o macOS por Padrão no Boot:**
+   * Na tela de boot do OpenCore, selecione o **macOS** com a seta para a direita, segure **`Ctrl`** e aperte **`Enter`**. A escolha fica gravada na NVRAM e o computador acorda sempre no macOS.
