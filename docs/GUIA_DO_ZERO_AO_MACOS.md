@@ -193,4 +193,14 @@ Parabéns! Você chegou à área de trabalho do macOS no seu Chromebook. Para de
 5. **Definir o macOS como Boot Padrão Automático:**
    * Na tela de boot do OpenCore, selecione o ícone do **macOS** (com a setinha para a direita), segure a tecla **`Ctrl`** e aperte **`Enter`**. A escolha é salva no NVRAM e o notebook passa a ligar direto no macOS sem precisar selecionar nada.
 
-Pronto! Agora você tem uma máquina premium x360 conversível rodando macOS liso, com som potente, tela incrível 3:2 e bateria de longa duração!
+6. **Ativar Escala de Tela HiDPI 3:2 (125% Retina sem Borrão):**
+   * A resolução nativa de 1920×1280 em 13.5" deixa os botões e textos miúdos a 100%.
+   * Execute o utilitário incluído na pasta `tools/hidpi`:
+     ```bash
+     cd tools/hidpi
+     sudo ./ativar_hidpi_3x2.sh
+     ```
+   * Reinicie o computador. Nos *Ajustes do Sistema -> Telas* (ou no BetterDisplay), selecione o modo **1536 × 1024 (HiDPI)** para ter a escala perfeita de 125% com nitidez cristalina de um MacBook Retina de fábrica!
+
+Pronto! Agora você tem uma máquina premium x360 conversível rodando macOS liso, com som potente, tela incrível 3:2 com escala perfeita e bateria de longa duração!
+

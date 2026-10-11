@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>DisplayProductID</key>
+	<integer>1635</integer>
+	<key>DisplayVendorID</key>
+	<integer>12516</integer>
+	<key>DisplayProductName</key>
+	<string>Color LCD</string>
+	<key>scale-resolutions</key>
+	<array>
+		<data>AAAPAAAACgAA</data>
+		<data>AAANgAAACQAA</data>
+		<data>AAANIAAACMAA</data>
+		<data>AAAMgAAACFYA</data>
+		<data>AAAMAAAACAAA</data>
+		<data>AAALQAAAB4AA</data>
+		<data>AAAKgAAABwAA</data>
+		<data>AAAKAAAABqwA</data>
+		<data>AAAJAAAABgAA</data>
+		<data>AAAIAAAABVQA</data>
+		<data>AAAHgAAABQAA</data>
+		<data>AAAPAAAACgAAAAAJAKAAAA==</data>
+		<data>AAANgAAACQAAAAAJAKAAAA==</data>
+		<data>AAANIAAACMAAAAAJAKAAAA==</data>
+		<data>AAAMgAAACFYAAAAJAKAAAA==</data>
+		<data>AAAMAAAACAAAAAAJAKAAAA==</data>
+		<data>AAALQAAAB4AAAAAJAKAAAA==</data>
+		<data>AAAKgAAABwAAAAAJAKAAAA==</data>
+		<data>AAAKAAAABqwAAAAJAKAAAA==</data>
+		<data>AAAJAAAABgAAAAAJAKAAAA==</data>
+		<data>AAAIAAAABVQAAAAJAKAAAA==</data>
+		<data>AAAHgAAABQAAAAAJAKAAAA==</data>
+		<data>AAAHgAAABQAAAAABACAAAA==</data>
+		<data>AAAGwAAABIAAAAABACAAAA==</data>
+		<data>AAAGkAAABGAAAAABACAAAA==</data>
+		<data>AAAGQAAABCsAAAABACAAAA==</data>
+		<data>AAAGAAAABAAAAAABACAAAA==</data>
+		<data>AAAFoAAAA8AAAAABACAAAA==</data>
+		<data>AAAFQAAAA4AAAAABACAAAA==</data>
+		<data>AAAFAAAAA1YAAAABACAAAA==</data>
+		<data>AAAEgAAAAwAAAAABACAAAA==</data>
+		<data>AAAEAAAAAqoAAAABACAAAA==</data>
+		<data>AAADwAAAAoAAAAABACAAAA==</data>
+		<data>AAAHgAAABQAAAAAB</data>
+		<data>AAAGwAAABIAAAAAB</data>
+		<data>AAAGkAAABGAAAAAB</data>
+		<data>AAAGQAAABCsAAAAB</data>
+		<data>AAAGAAAABAAAAAAB</data>
+		<data>AAAFoAAAA8AAAAAB</data>
+		<data>AAAFQAAAA4AAAAAB</data>
+		<data>AAAFAAAAA1YAAAAB</data>
+		<data>AAAEgAAAAwAAAAAB</data>
+		<data>AAAEAAAAAqoAAAAB</data>
+		<data>AAADwAAAAoAAAAAB</data>
+	</array>
+	<key>target-default-ppmm</key>
+	<real>10.0699301</real>
+</dict>
+</plist>

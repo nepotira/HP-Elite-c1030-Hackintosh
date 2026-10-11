@@ -95,3 +95,8 @@ A maioria dos atalhos clássicos do Windows utiliza a tecla **Command** (`⌘`) 
    * Selecione seu teclado e você pode trocar a função da tecla `Control` para se comportar como `Command`.
 4. **Iniciar o macOS por Padrão no Boot:**
    * Na tela de boot do OpenCore, selecione o **macOS** com a seta para a direita, segure **`Ctrl`** e aperte **`Enter`**. A escolha fica gravada na NVRAM e o computador acorda sempre no macOS.
+5. **Escala da Tela de 125% (O equivalente ao slider do Windows):**
+   * No Windows, a escala padrão confortável para uma tela de 13.5" é **125%**.
+   * No macOS, o sistema esconde as opções de escala em telas que não são da Apple, deixando tudo pequeno (100%) ou borrado se você diminuir a resolução.
+   * Para resolver isso com nitidez cristalina, execute o script `sudo ./tools/hidpi/ativar_hidpi_3x2.sh` e reinicie. O modo **1536 × 1024 (HiDPI)** é exatamente a escala de 125% do Windows renderizada em dobro (3072×2048) e reduzida com precisão Retina para o painel.
+

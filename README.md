@@ -59,7 +59,9 @@ Se você acabou de comprar o Chromebook e ele ainda está com o ChromeOS de fáb
 | **Streaming com DRM (Netflix/Prime Video)** | ✅ Funcionando | FairPlay nativo 1080p no Safari e Widevine no Chrome (com `-amfipassbeta`) |
 | **Permissões do Sistema (TCC / WhatsApp)** | ✅ Funcionando | Pop-ups nativos de microfone/câmera liberados via `AMFIPass.kext` |
 | **Controles de Jogo (GameSir Nova Lite)** | ✅ Funcionando | Suporte completo via Dongle USB 2.4 GHz (XInput) com utilitários dedicados e Bluetooth nativo |
+| **Escala da Tela HiDPI (Retina 3:2)** | ✅ Funcionando | Resoluções HiDPI 3:2 (125% / 1536×1024, 1600×1067) com nitidez cristalina via pacote `tools/hidpi` |
 | **Sleep / Wake** | ✅ Funcionando | Suspensão e despertar funcionando perfeitamente |
+
 
 ---
 
@@ -157,12 +159,22 @@ Para quem joga no **Xbox Cloud Gaming (xCloud)** e busca a menor latência poss�
 #### 📱 Modo Bluetooth Nativo (Alternativa sem Dongle):
 * Ligue o controle em modo Nintendo Switch (`Home + B` ou `Home + Y`) ou Xbox Wireless Controller e emparelhe via Bluetooth. O macOS reconhece pelo framework Apple Game Controller (`GCController`) nativamente.
 
+### 6. 🖥️ Escala HiDPI Nativa para a Tela 3:2 (1920×1280 IPS 13.5")
+A tela do HP Elite c1030 é um painel IPS de 13.5 polegadas com resolução nativa de **1920 × 1280 (proporção 3:2)**.
+Por padrão, o macOS só exibe os botões de escala (como nos MacBooks Retina de fábrica) para monitores oficiais da Apple ou painéis 4K/5K. Em telas de terceiros de densidade padrão, o macOS esconde o seletor de escala, deixando tudo pequeno em 100% ou completamente borrado se você escolher uma resolução mais baixa comum.
+
+Com o utilitário customizado na pasta **`tools/hidpi`**:
+* **Resoluções HiDPI 3:2 Reais:** Injetamos um arquivo DisplayOverride sob medida (`VendorID 0x30e4`, `ProductID 0x0663`) com modos matematicamente perfeitos na proporção 3:2.
+* **Escala de 125% Retina (1536 × 1024):** O sistema renderiza a interface internamente em **3072 × 2048** com vetores ultra nítidos e faz o downsampling para os 1920×1280 físicos da tela. Os elementos ficam no tamanho perfeito para os olhos (idêntico aos 125% do Windows), com **100% da nitidez de um MacBook Retina original**.
+* **Sem perda de resolução:** O sinal da GPU continua em 1920×1280 a 60Hz cravados para o monitor físico.
+* 👉 **[Acesse o Pacote de Ferramentas e Instruções de HiDPI](tools/hidpi/README.md)** na pasta `tools/hidpi/`.
+
 ---
 
 ## 📖 Como Usar a EFI
 
 ### Opção 1: Baixar a Release Pronta (Recomendado)
-1. Vá na aba **[Releases](https://github.com/nepotira/HP-Elite-c1030-Hackintosh/releases/latest)** e baixe o arquivo **`EFI-HP-Elite-c1030-v1.1.2.zip`**.
+1. Vá na aba **[Releases](https://github.com/nepotira/HP-Elite-c1030-Hackintosh/releases/latest)** e baixe o arquivo **`EFI-HP-Elite-c1030-v1.1.3.zip`**.
 2. Extraia o arquivo zip.
 3. Copie a pasta `EFI` para a partição EFI (FAT32) do seu SSD ou pendrive bootável.
 
@@ -176,7 +188,7 @@ Copie a pasta `EFI` do repositório para a partição EFI (FAT32).
 
 ### 🛠️ Pós-Instalação Obrigatória (Primeiros Passos no macOS)
 
-Assim que o macOS inicializar pela primeira vez usando a EFI, execute estas duas etapas essenciais:
+Assim que o macOS inicializar pela primeira vez usando a EFI, execute estas etapas essenciais:
 
 1. **Ativar o Áudio com Volume Alto Nativo (100% de ganho):**
    O OpenCore carrega a kext no kernel, mas o subsistema Sound Open Firmware (SOF) do Chromebook precisa do plugin HAL dentro do macOS. Abra o Terminal e rode:
@@ -195,9 +207,14 @@ Assim que o macOS inicializar pela primeira vez usando a EFI, execute estas duas
 4. **Definir o macOS como Inicialização Padrão no Boot:**
    Na tela do OpenCore, selecione o **macOS** (com a setinha para a direita), segure a tecla **`Ctrl`** e aperte **`Enter`**. O OpenCore grava a preferência na NVRAM, fazendo o computador acordar sempre no macOS por padrão.
 
----
+5. **Ativar a Escala HiDPI Nativa da Tela 3:2 (125% Retina sem Borrão):**
+   Para deixar textos, janelas e ícones no tamanho ideal sem perder um único pingo de nitidez:
+   ```bash
+   cd tools/hidpi
+   sudo ./ativar_hidpi_3x2.sh
+   ```
+   Reinicie o notebook. Nos *Ajustes do Sistema -> Telas* (ou no BetterDisplay), selecione o modo **1536 × 1024 (HiDPI)**!
 
----
 
 ## ⌨️ Mapeamento de Teclas do Chromebook
 
@@ -223,16 +240,18 @@ Como o layout de teclado físico do Chromebook HP Elite c1030 difere do teclado 
 
 ---
 
-## 📦 Arquivos para Download (Release v1.1.2 Oficial)
+## 📦 Arquivos para Download (Release v1.1.3 Oficial)
 
-Todos os arquivos necessários para rodar o macOS com 100% dos recursos configurados estão disponíveis diretamente na página de **[Releases](https://github.com/nepotira/HP-Elite-c1030-Hackintosh/releases/tag/v1.1.2)**:
+Todos os arquivos necessários para rodar o macOS com 100% dos recursos configurados estão disponíveis diretamente na página de **[Releases](https://github.com/nepotira/HP-Elite-c1030-Hackintosh/releases/tag/v1.1.3)**:
 
 | Arquivo | Tamanho | Descrição | Download Direto |
 | :--- | :---: | :--- | :---: |
-| **`EFI-HP-Elite-c1030-v1.1.2.zip`** | 68.9 MB | Pasta EFI completa (`BOOT` + `OC`) pronta para copiar na partição EFI | [Baixar EFI](https://github.com/nepotira/HP-Elite-c1030-Hackintosh/releases/download/v1.1.2/EFI-HP-Elite-c1030-v1.1.2.zip) |
-| **`Audio-Boost-HP-Elite-c1030.zip`** | 13.9 KB | Instalador do driver de áudio HAL com 100% de volume alto nativo | [Baixar Audio Boost](https://github.com/nepotira/HP-Elite-c1030-Hackintosh/releases/download/v1.1.2/Audio-Boost-HP-Elite-c1030.zip) |
-| **`GameSir-Nova-Lite-Mac-Tool.zip`** | 28.7 KB | Utilitários, scripts de assinatura Ad-Hoc e alternador de perfil EFI para Dongle USB 2.4 GHz | [Baixar Ferramentas GameSir](https://github.com/nepotira/HP-Elite-c1030-Hackintosh/releases/download/v1.1.2/GameSir-Nova-Lite-Mac-Tool.zip) |
-| **`HeliPort.dmg`** | 8.2 MB | Aplicativo oficial para gerenciamento e conexão do Wi-Fi Intel | [Baixar HeliPort](https://github.com/nepotira/HP-Elite-c1030-Hackintosh/releases/download/v1.1.2/HeliPort.dmg) |
+| **`EFI-HP-Elite-c1030-v1.1.3.zip`** | 68.9 MB | Pasta EFI completa (`BOOT` + `OC`) pronta para copiar na partição EFI | [Baixar EFI](https://github.com/nepotira/HP-Elite-c1030-Hackintosh/releases/download/v1.1.3/EFI-HP-Elite-c1030-v1.1.3.zip) |
+| **`HiDPI-3x2-HP-Elite-c1030.zip`** | 269 KB | Pacote de injeção de resoluções HiDPI (Retina) sob medida para a tela 3:2 (125%, 1536×1024) | [Baixar Pacote HiDPI 3:2](https://github.com/nepotira/HP-Elite-c1030-Hackintosh/releases/download/v1.1.3/HiDPI-3x2-HP-Elite-c1030.zip) |
+| **`Audio-Boost-HP-Elite-c1030.zip`** | 13.9 KB | Instalador do driver de áudio HAL com 100% de volume alto nativo | [Baixar Audio Boost](https://github.com/nepotira/HP-Elite-c1030-Hackintosh/releases/download/v1.1.3/Audio-Boost-HP-Elite-c1030.zip) |
+| **`GameSir-Nova-Lite-Mac-Tool.zip`** | 28.7 KB | Utilitários, scripts de assinatura Ad-Hoc e alternador de perfil EFI para Dongle USB 2.4 GHz | [Baixar Ferramentas GameSir](https://github.com/nepotira/HP-Elite-c1030-Hackintosh/releases/download/v1.1.3/GameSir-Nova-Lite-Mac-Tool.zip) |
+| **`HeliPort.dmg`** | 8.2 MB | Aplicativo oficial para gerenciamento e conexão do Wi-Fi Intel | [Baixar HeliPort](https://github.com/nepotira/HP-Elite-c1030-Hackintosh/releases/download/v1.1.3/HeliPort.dmg) |
+
 
 ---
 
@@ -258,6 +277,7 @@ Este projeto é distribuído sob a **[Licença MIT](LICENSE)**.
   - Otimização do framebuffer de vídeo da Intel UHD 630 e correção de congelamento nas portas USB-C com monitores externos.
   - Correção de decodificação de vídeo (remoção do deadlock de `forceRenderStandby`).
   - Remoção do bloqueio de AMFI para restauração das permissões de microfone/câmera e DRM Widevine.
+  - Engenharia e injeção do pacote de resoluções HiDPI nativas 3:2 para o painel IPS 13.5" (1920×1280), adaptando a estrutura do projeto open-source `xzhih/one-key-hidpi` para o formato 3:2 e macOS 26 Tahoe / Sequoia.
   - Criação da documentação completa, scripts automatizados e guias de migração.
 
 ### ⚖️ Disclaimer Legal:
@@ -272,6 +292,7 @@ Este projeto é fruto da pesquisa e cooperação ativa da comunidade Hackintosh 
 * **[starsnwind](https://github.com/starsnwind/HP-Elite-C1030---x360-13c-Chromebook-Hackintosh):** Autor do repositório base original para o HP Elite c1030 (Jinlon), pioneiro na criação dos SSDTs de teclado, trackpad e estrutura de ACPI.
 * **Bantryred:** O grande amigo e colaborador que na Issue #7 do repositório do starsnwind descobriu o caminho para rodar o macOS Tahoe, compartilhou sua pasta EFI pelo Google Drive e encontrou o driver `CmlSOFAudio` para toda a comunidade!
 * **[DexterSLamb](https://github.com/DexterSLamb/CmlSOFAudio):** Pelo desenvolvimento revolucionário do driver `CmlSOFAudio` (Sound Open Firmware) para o chipset Comet Lake cAVS no HP c1030.
+* **[xzhih (one-key-hidpi)](https://github.com/xzhih/one-key-hidpi):** Pelo projeto pioneiro e utilitário open-source `one-key-hidpi` (Licença MIT), cuja metodologia de injeção de Display Overrides serviu como base para a criação da nossa solução customizada e adaptada para painéis 3:2 (1920×1280).
 * **[JeoJay127](https://github.com/JeoJay127/OCLP-X):** Pelo projeto e patches do OCLP-X.
 * **[OpenIntelWireless](https://github.com/OpenIntelWireless):** Pelos drivers `itlwm`, `IntelBluetoothFirmware` e o aplicativo `HeliPort`.
 * **[LinearMouse Team](https://github.com/linearmouse/linearmouse):** Pelo utilitário open-source essencial para mouse no macOS.
@@ -279,3 +300,4 @@ Este projeto é fruto da pesquisa e cooperação ativa da comunidade Hackintosh 
 * **[MrChromebox](https://mrchromebox.tech/):** Pelo firmware UEFI Coreboot Full ROM que torna a instalação de sistemas operacionais padrão possível nos Chromebooks.
 * **[VoodooI2C Team](https://github.com/VoodooI2C/VoodooI2C):** Pelo suporte aos gestos do trackpad multitoque.
 * **[CoolStar](https://coolstar.org/):** Pelos trabalhos fundamentais de drivers para Chromebooks.
+
