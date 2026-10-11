@@ -186,4 +186,8 @@ Parabéns! Você chegou à área de trabalho do macOS no seu Chromebook. Para de
    * Instale o **LinearMouse** para ajustar a direção e aceleração do ponteiro.
    * Consulte o nosso **[Guia de Dicas de Migração do Windows](DICAS_MIGRACAO_WINDOWS.md)** para ter Snap de janelas e atalhos idênticos aos do PC.
 
+4. **Jogos e Controle GameSir Nova Lite (Dongle USB 2.4 GHz & xCloud):**
+   * Se você joga no **Xbox Cloud Gaming (xCloud)** via Google Chrome com o dongle USB de baixa latência, confira nosso **[Guia e Utilitários do GameSir](../tools/gamesir_nova_lite/README.md)**.
+   * **Dica de compatibilidade com a Netflix:** Para manter a melhor resposta no xCloud pelo Chrome sem abrir mão de filmes e séries com DRM, assista à Netflix pelo **Safari** (que utiliza aceleração nativa por hardware **Apple FairPlay** em 1080p Full HD) ou assine o programa de controle localmente via Ad-Hoc usando o nosso utilitário `setup_gamesir_dongle.command`!
+
 Pronto! Agora você tem uma máquina premium x360 conversível rodando macOS liso, com som potente, tela incrível 3:2 e bateria de longa duração!

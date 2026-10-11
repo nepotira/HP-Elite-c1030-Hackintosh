@@ -58,7 +58,7 @@ Se você acabou de comprar o Chromebook e ele ainda está com o ChromeOS de fáb
 | **Reprodução de Vídeos (YouTube/Navegadores)** | ✅ Funcionando | Decodificação por hardware fluida (corrigido com remoção de `forceRenderStandby=0`) |
 | **Streaming com DRM (Netflix/Prime Video)** | ✅ Funcionando | FairPlay nativo 1080p no Safari e Widevine no Chrome (com `-amfipassbeta`) |
 | **Permissões do Sistema (TCC / WhatsApp)** | ✅ Funcionando | Pop-ups nativos de microfone/câmera liberados via `AMFIPass.kext` |
-| **Controles de Jogo (GameSir Nova Lite)** | ✅ Funcionando | Suporte nativo via Bluetooth (Modo Nintendo Switch / Xbox) sem afetar o DRM |
+| **Controles de Jogo (GameSir Nova Lite)** | ✅ Funcionando | Suporte completo via Dongle USB 2.4 GHz (XInput) com utilitários dedicados e Bluetooth nativo |
 | **Sleep / Wake** | ✅ Funcionando | Suspensão e despertar funcionando perfeitamente |
 
 ---
@@ -142,22 +142,27 @@ Existem 5 razões reais de engenharia pelas quais o macOS ganha tanta fluidez co
 * **Aceleração DRM (Netflix/Prime Video):** Com o AMFI mantido de forma compatível via `AMFIPass`, a biblioteca Widevine do Google Chrome (`libwidevinecdm.dylib`) carrega com validação íntegra, permitindo a reprodução de streamings protegidos por direitos autorais. No Safari, o streaming roda via **Apple FairPlay nativo por hardware**.
 * **Por que NÃO usar o Intel GuC Firmware (`igfxfw=2`):** O firmware Coreboot / MrChromebox não implementa os canais de autenticação proprietários da Intel MEI (*Management Engine*). Tentar forçar o carregamento do GuC via `igfxfw=2` faz o driver `AppleIntelKBLGraphics` entrar em loop de espera infinito (*hardware timeout*), travando o boot na barra da maçã.
 
-### 5. 🎮 Controles de Jogo no macOS (GameSir Nova Lite & xCloud)
-O **GameSir Nova Lite** suporta múltiplos modos de conexão. Para jogar no **xCloud (Xbox Cloud Gaming)** no Google Chrome sem quebrar a segurança ou o DRM do sistema:
-1. **Modo Recomendado: Nintendo Switch via Bluetooth (`Home + B` ou `Home + Y`):**
-   * Ligue o controle na combinação do modo Switch e emparelhe via Bluetooth no macOS. O sistema reconhece o controle nativamente pelo framework Apple Game Controller (`GCController`), com suporte a todos os botões, analógicos e gatilhos no Chrome sem instalar drivers!
-2. **Modo Xbox Wireless Controller:** Emparelhe no modo Bluetooth padrão de Xbox.
-3. **⚠️ Atenção sobre o boot-arg `amfi_get_out_of_my_way=1`:**
-   * Se for utilizado o argumento `amfi_get_out_of_my_way=1` para rodar gambiarras ou pontes não assinadas de XInput, o macOS desativa a validação de bibliotecas (*Library Validation*).
-   * **Consequência:** Isso impede o módulo Widevine do Google Chrome de carregar, **quebrando a reprodução da Netflix e outros streamings protegidos por DRM**.
-   * Ao utilizar os modos nativos de Bluetooth do controle, a integridade do sistema permanece ativa, o controle funciona no xCloud e a Netflix continua tocando perfeitamente!
+### 5. 🎮 Controles de Jogo no macOS (GameSir Nova Lite com Dongle 2.4 GHz & xCloud)
+O **GameSir Nova Lite** é o controle ideal para o HP Elite c1030, oferecendo conexão sem fio tanto pelo **Dongle USB 2.4 GHz de baixa latência** quanto por **Bluetooth**.
+
+#### ⚡ Usando o Dongle USB 2.4 GHz (Modo XInput - LED Verde) no xCloud / Google Chrome:
+Para quem joga no **Xbox Cloud Gaming (xCloud)** e busca a menor latência possível sem depender de Bluetooth:
+1. **O Cenário:** O dongle do GameSir opera em modo XInput padrão de fábrica (`Home + X`, LED verde). Navegadores baseados em Chromium no macOS necessitam de uma ponte/driver para mapear dispositivos XInput via USB.
+2. **Como ter GameSir com Dongle E Netflix funcionando ao mesmo tempo:**
+   * **Cenário A (Prático e Imediato):** Com o perfil de bypass da EFI (`amfi_get_out_of_my_way=1`), você joga no **Google Chrome com o Dongle USB 2.4 GHz** com resposta imediata. Para assistir à **Netflix**, basta abrir o **Safari**! O Safari não depende do módulo Widevine do Chrome; ele utiliza o decodificador nativo da Apple por hardware (**Apple FairPlay** acelerado pela Intel UHD 630 com `unfairgva=1`), reproduzindo em **1080p Full HD** sem nenhum conflito!
+   * **Cenário B (Tudo no Google Chrome com Assinatura Ad-Hoc):** Se você prefere assistir à Netflix dentro do Chrome, mantenha a EFI Padrão v1.1.0 e utilize o utilitário **`setup_gamesir_dongle.command`** da pasta `tools/gamesir_nova_lite/`. O script assina a ponte de controle localmente (`codesign --force --deep --sign -`), fazendo o macOS confiar no programa com o AMFI ativo!
+   * **Cenário C (Alternador de Perfis de EFI no Windows):** Incluímos o script **`ALTERNAR_EFI.bat`** para quem usa dual-boot com Windows poder alternar entre o perfil Padrão e o perfil XInput com apenas 1 clique.
+3. 👉 **[Acesse o Pacote de Ferramentas e Instruções do GameSir](tools/gamesir_nova_lite/README.md)** na pasta `tools/gamesir_nova_lite/`.
+
+#### 📱 Modo Bluetooth Nativo (Alternativa sem Dongle):
+* Ligue o controle em modo Nintendo Switch (`Home + B` ou `Home + Y`) ou Xbox Wireless Controller e emparelhe via Bluetooth. O macOS reconhece pelo framework Apple Game Controller (`GCController`) nativamente.
 
 ---
 
 ## 📖 Como Usar a EFI
 
 ### Opção 1: Baixar a Release Pronta (Recomendado)
-1. Vá na aba **[Releases](https://github.com/nepotira/HP-Elite-c1030-Hackintosh/releases/latest)** e baixe o arquivo **`EFI-HP-Elite-c1030-v1.0.0.zip`**.
+1. Vá na aba **[Releases](https://github.com/nepotira/HP-Elite-c1030-Hackintosh/releases/latest)** e baixe o arquivo **`EFI-HP-Elite-c1030-v1.1.0.zip`**.
 2. Extraia o arquivo zip.
 3. Copie a pasta `EFI` para a partição EFI (FAT32) do seu SSD ou pendrive bootável.
 
@@ -219,15 +224,16 @@ Como o layout de teclado físico do Chromebook HP Elite c1030 difere do teclado 
 
 ---
 
-## 📦 Arquivos para Download (Release v1.0.0 Oficial)
+## 📦 Arquivos para Download (Release v1.1.0 Oficial)
 
-Todos os arquivos necessários para rodar o macOS com 100% dos recursos configurados estão disponíveis diretamente na página de **[Releases](https://github.com/nepotira/HP-Elite-c1030-Hackintosh/releases/tag/v1.0.0)**:
+Todos os arquivos necessários para rodar o macOS com 100% dos recursos configurados estão disponíveis diretamente na página de **[Releases](https://github.com/nepotira/HP-Elite-c1030-Hackintosh/releases/tag/v1.1.0)**:
 
 | Arquivo | Tamanho | Descrição | Download Direto |
 | :--- | :---: | :--- | :---: |
-| **`EFI-HP-Elite-c1030-v1.0.0.zip`** | 68.9 MB | Pasta EFI completa (`BOOT` + `OC`) pronta para copiar na partição EFI | [Baixar EFI](https://github.com/nepotira/HP-Elite-c1030-Hackintosh/releases/download/v1.0.0/EFI-HP-Elite-c1030-v1.0.0.zip) |
-| **`Audio-Boost-HP-Elite-c1030.zip`** | 13.9 KB | Instalador do driver de áudio HAL com 100% de volume alto nativo | [Baixar Audio Boost](https://github.com/nepotira/HP-Elite-c1030-Hackintosh/releases/download/v1.0.0/Audio-Boost-HP-Elite-c1030.zip) |
-| **`HeliPort.dmg`** | 8.2 MB | Aplicativo oficial para gerenciamento e conexão do Wi-Fi Intel | [Baixar HeliPort](https://github.com/nepotira/HP-Elite-c1030-Hackintosh/releases/download/v1.0.0/HeliPort.dmg) |
+| **`EFI-HP-Elite-c1030-v1.1.0.zip`** | 68.9 MB | Pasta EFI completa (`BOOT` + `OC`) pronta para copiar na partição EFI | [Baixar EFI](https://github.com/nepotira/HP-Elite-c1030-Hackintosh/releases/download/v1.1.0/EFI-HP-Elite-c1030-v1.1.0.zip) |
+| **`Audio-Boost-HP-Elite-c1030.zip`** | 13.9 KB | Instalador do driver de áudio HAL com 100% de volume alto nativo | [Baixar Audio Boost](https://github.com/nepotira/HP-Elite-c1030-Hackintosh/releases/download/v1.1.0/Audio-Boost-HP-Elite-c1030.zip) |
+| **`GameSir-Nova-Lite-Mac-Tool.zip`** | 20.7 KB | Utilitários, scripts de assinatura Ad-Hoc e alternador de perfil EFI para Dongle USB 2.4 GHz | [Baixar Ferramentas GameSir](https://github.com/nepotira/HP-Elite-c1030-Hackintosh/releases/download/v1.1.0/GameSir-Nova-Lite-Mac-Tool.zip) |
+| **`HeliPort.dmg`** | 8.2 MB | Aplicativo oficial para gerenciamento e conexão do Wi-Fi Intel | [Baixar HeliPort](https://github.com/nepotira/HP-Elite-c1030-Hackintosh/releases/download/v1.1.0/HeliPort.dmg) |
 
 ---
 

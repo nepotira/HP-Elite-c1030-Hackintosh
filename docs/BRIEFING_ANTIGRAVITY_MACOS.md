@@ -13,7 +13,7 @@
 * **Firmware:** Coreboot / MrChromebox Full ROM UEFI
 * **Sistema Operacional:** macOS 15 / 26 (Tahoe / Sonoma)
 * **Repositório Oficial do Projeto no GitHub:** [https://github.com/nepotira/HP-Elite-c1030-Hackintosh](https://github.com/nepotira/HP-Elite-c1030-Hackintosh)
-* **Release Publicada:** v1.0.0 com `EFI-HP-Elite-c1030-v1.0.0.zip`, `Audio-Boost-HP-Elite-c1030.zip` e `HeliPort.dmg`.
+* **Release Publicada:** v1.1.0 com `EFI-HP-Elite-c1030-v1.1.0.zip`, `Audio-Boost-HP-Elite-c1030.zip`, `GameSir-Nova-Lite-Mac-Tool.zip` e `HeliPort.dmg`.
 
 ---
 
@@ -21,57 +21,46 @@
 * **Controlador de Som:** Intel Comet Lake PCH-LP cAVS / DSP (Sound Open Firmware - SOF, PCI `0x02c88086`). O notebook **NÃO possui codec analógico High Definition Audio (HDA) Realtek tradicional**; todo o áudio é processado digitalmente pelo DSP.
 * **Driver do Kernel:** `CmlSOFAudio.kext` (v1.1.5 por DexterSLamb), ativo no OpenCore (`Kernel -> Add`).
 * **Driver de Espaço do Usuário (HAL):** `CmlSOFAudioPlugin.driver` em `/Library/Audio/Plug-Ins/HAL/`.
-* **Alto-falantes & Fones:** Funcionando. Na pasta `audio_boost/` do repositório, corrigimos o binário do plugin HAL alterando o multiplicador de ganho de `0.25f` para `1.0f` (volume alto nativo de 100%).
-* **Microfone Interno (DMIC):**
-  * Hardware: Matriz DMIC de 4 canais conectada via PDM ao pipeline 3 do DSP.
-  * **STATUS CONFIRMADO PELO USUÁRIO:** O microfone **ESTÁ FUNCIONANDO PERFEITAMENTE**! Foi testado com sucesso nos *Ajustes do Sistema -> Som -> Entrada* (com as barras de nível mexendo) e gravando áudio cristalino no aplicativo nativo **Gravador de Voz da Apple (Voice Memos)**.
+* **Alto-falantes & Fones:** Funcionando. Na pasta `audio_boost/` do repositório, disponibilizamos o instalador `instalar_audio_boost.sh` com o multiplicador de ganho alterado para `1.0f` (volume alto nativo de 100%).
+* **Microfone Interno (DMIC):** 100% Funcional (matriz DMIC de 4 canais via pipeline 3 do DSP).
+* **WhatsApp Desktop & TCC:** **RESOLVIDO na v1.1.0!** A causa do bloqueio anterior era a antiga flag `amfi=0x80`. Com a migração para o `AMFIPass.kext` e o boot-arg `-amfipassbeta`, todos os pop-ups nativos de autorização de microfone e câmera funcionam perfeitamente.
+* **Reprodução de Vídeos & Netflix:** **RESOLVIDO na v1.1.0!** Destravado com a remoção de `forceRenderStandby=0` e DRM Widevine no Chrome com AMFIPass, além do Apple FairPlay nativo 1080p no Safari.
 
 ---
 
-### 🚨 3. O Problema Específico a Resolver Agora no macOS
-O hardware do microfone está 100% funcional no sistema, mas **aplicativos de terceiros (especialmente o WhatsApp Desktop) não conseguem gravar áudio e NÃO aparecem na lista de permissão de microfone em *Ajustes do Sistema -> Privacidade e Segurança -> Microfone***:
-1. Ao clicar no ícone de microfone dentro de uma conversa do WhatsApp Desktop para mandar mensagem de voz, o aplicativo não grava nada e **não dispara o pop-up nativo da Apple pedindo autorização**.
-2. Foi executado o comando `tccutil reset Microphone` pelo Terminal, o que resetou com sucesso o banco de dados do TCC (a Steam que estava na lista sumiu, como esperado), mas o WhatsApp ainda assim não pediu permissão nem entrou na lista.
-3. Além disso, os **Serviços de Localização (CoreLocation)** só funcionam por aproximação de IP, pois o driver Wi-Fi Intel `itlwm` emula uma conexão cabeada Ethernet e o daemon `locationd` da Apple não recebe escaneamento de BSSIDs Wi-Fi nativo.
+### 🎮 3. Foco Atual: Suporte ao Controle GameSir Nova Lite com Dongle USB 2.4 GHz (xCloud)
+
+O usuário utiliza o controle **GameSir Nova Lite** com o **Dongle USB 2.4 GHz em modo XInput (LED Verde)** para jogar no **Xbox Cloud Gaming (xCloud)** via Google Chrome com a menor latência possível:
+
+#### 💡 Soluções Implementadas no Repositório (`tools/gamesir_nova_lite/`):
+
+1. **Como manter o GameSir com Dongle E a Netflix funcionando ao mesmo tempo:**
+   * **Cenário A (Prático e Imediato):** 
+     - Se estiver usando o perfil de EFI com `amfi_get_out_of_my_way=1` (para que a bridge de XInput do dongle rode no Chrome), a Netflix toca em **1080p Full HD no Safari**!
+     - *Explicação técnica:* O Safari não usa o plugin Widevine do Chrome; ele utiliza o decodificador nativo da Apple por hardware (**Apple FairPlay** acelerado pela GPU Intel UHD 630 via `unfairgva=1`). No Safari, a Netflix toca sem qualquer limitação.
+   * **Cenário B (Tudo dentro do Google Chrome):**
+     - Mantenha a EFI Padrão v1.1.0 (com AMFI ativo).
+     - Execute o script `setup_gamesir_dongle.command` na pasta `tools/gamesir_nova_lite/`.
+     - Aplique a assinatura local Ad-Hoc no binário ou aplicativo da bridge de controle:
+       ```bash
+       sudo xattr -cr "/caminho/do/programa_ou_daemon"
+       sudo codesign --force --deep --sign - "/caminho/do/programa_ou_daemon"
+       ```
+     - O macOS confia na execução do programa com AMFI ativo, permitindo o controle no Chrome e a validação do Widevine da Netflix no Chrome!
+
+2. **Ferramenta de Alternância de Perfis de EFI (`ALTERNAR_EFI.bat`):**
+   - Disponível na pasta `tools/gamesir_nova_lite/` e na Área de Trabalho do Windows para alternar entre os perfis com 1 clique se o usuário estiver em dual-boot.
 
 ---
 
-### 🛠️ 4. Diagnósticos e Tarefas Prioritárias para o Antigravity executar no macOS:
+### 🛠️ 4. Ações Recomendadas para o Antigravity executar no macOS:
 
-#### Tarefa A: Diagnosticar o WhatsApp e o TCC (Microphone Permission)
-1. **Identificar a versão exata do WhatsApp instalada:**
-   * Verificar se é a versão da Mac App Store (Catalyst, Bundle ID `net.whatsapp.WhatsApp`) ou a versão Web/Electron baixada do site (`desktop.WhatsApp` ou `WhatsApp.app`).
-   * Comando no Terminal:
-     ```bash
-     osascript -e 'id of app "WhatsApp"'
-     ```
-2. **Checar as configurações internas de entrada de áudio do WhatsApp:**
-   * Abrir o WhatsApp -> Configurações (Settings) -> Áudio / Chamadas -> Dispositivo de Entrada de Áudio.
-   * Verificar se o dispositivo selecionado é o "Microfone Interno" ou se está nulo/padrão incorreto.
-3. **Forçar o handshake de permissão via Chamada de Voz:**
-   * Testar iniciar uma **chamada de voz (ligação)** no WhatsApp para forçar o motor WebRTC do app a requisitar a API de hardware do macOS.
-4. **Verificar logs do sistema ao tentar gravar:**
-   * No Terminal do macOS:
-     ```bash
-     log stream --predicate 'process == "WhatsApp" or subsystem contains "tcc" or subsystem contains "audio"' --info
-     ```
-   * Clicar no microfone do WhatsApp e analisar exatamente qual erro ou exceção o WhatsApp ou o TCC disparam.
-5. **Injeção ou liberação no banco de dados TCC (se necessário):**
-   * Verificar o estado no banco de dados local do usuário em `~/Library/Application Support/com.apple.TCC/TCC.db`.
-   * Testar abrir o WhatsApp direto pelo binário no Terminal:
-     ```bash
-     open /Applications/WhatsApp.app/Contents/MacOS/WhatsApp
-     ```
-
-#### Tarefa B: Garantir a Instalação do Áudio Alto Nativo (`audio_boost`)
-Se ainda não foi executado no macOS, rodar o instalador da pasta `audio_boost`:
-```bash
-cd ~/Desktop/HP-Elite-c1030-Hackintosh/audio_boost
-sudo ./instalar_audio_boost.sh
-```
-
-#### Tarefa C: Testar Atalhos do Teclado e Iluminação
-* Testar os atalhos de iluminação do teclado identificados no repositório starsnwind: `F8 / F9` ou `Alt(Cmd) + F6 / F7` (desativando ajuste automático em Ajustes -> Teclado).
+1. **Validar Áudio Alto Nativo:**
+   * Garantir que o script `sudo ./instalar_audio_boost.sh` da pasta `audio_boost` foi executado.
+2. **Auxiliar na Configuração do GameSir Nova Lite:**
+   * Caso o usuário queira rodar a ponte do dongle XInput com AMFI ativo para manter o Chrome 100% validado para Netflix, executar o `setup_gamesir_dongle.command` e assinar o binário localmente via Ad-Hoc.
+3. **Verificar Conexão Wi-Fi com HeliPort:**
+   * Garantir que o `HeliPort.app` está em `/Applications` e adicionado aos Itens de Início em `Ajustes do Sistema -> Geral -> Itens de Início`.
 
 ---
-*Fim do briefing de transição. Antigravity, assuma o controle direto no terminal e ambiente do macOS para debugar e resolver o WhatsApp e o TCC.*
+*Fim do briefing de transição. Antigravity, o sistema está estável, rápido e com hardware calibrado na versão v1.1.0.*
