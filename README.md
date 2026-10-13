@@ -42,7 +42,7 @@ Se você acabou de comprar o Chromebook e ele ainda está com o ChromeOS de fáb
 | Recurso | Status | Observações |
 | :--- | :---: | :--- |
 | **Aceleração Gráfica Metal 3** | ✅ Funcionando | Intel UHD 630 com aceleração completa, transparências e animações fluidas |
-| **Monitor Externo USB-C (DisplayPort)** | ✅ Funcionando | Corrigido com `igfxagdc=0` e `disable-agdc` (sem congelamentos) |
+| **Monitor Externo USB-C (DisplayPort)** | ⚠️ Em Testes (Instável) | Funciona no Windows, mas no macOS o hotplug de cabos diretos USB-C para USB-C pode congelar o sistema; em investigação ativa |
 | **Gerenciamento de Energia da CPU** | ✅ Funcionando | `CPUFriend` tunado com EPP `0x40` para resposta instantânea de clock |
 | **Trackpad Multitoque** | ✅ Funcionando | Gestos nativos do macOS via `VoodooI2C` + `VoodooI2CELAN` (I2C0) |
 | **Áudio (Alto-falantes & Fones)** | ✅ Funcionando | Driver SOF (`CmlSOFAudio`). Volume alto nativo via pacote `audio_boost` |
@@ -106,9 +106,15 @@ Preparamos um guia completo dedicado a quem está migrando do Windows para o mac
 
 ## 🛠️ Correções e Otimizações Críticas Aplicadas
 
-### 1. Correção do Monitor Externo USB-C (DisplayPort Alt Mode)
-* **O Problema:** Conectar uma tela externa via USB-C espelhava o vídeo por poucos segundos e congelava o sistema por completo.
-* **A Solução:** Adicionados `igfxagdc=0` aos `boot-args` e `disable-agdc = 01000000` em `DeviceProperties`. A memória do framebuffer (`fbmem`) foi calibrada em 9 MB e o `framebuffer-cursormem` inflado foi removido, permitindo que as duas telas operem simultaneamente sem estourar o limite de memória DVMT da BIOS.
+### 1. Monitor Externo USB-C (DisplayPort Alt Mode) — [STATUS: EM TESTES / INSTÁVEL]
+* **Situação Atual:** No Windows, o sinal de vídeo externo via USB-C (DisplayPort Alt Mode) funciona perfeitamente (testado com monitor portátil Full HD `RTK1920` na porta direita), comprovando que o conector físico, a GPU e o monitor são plenamente funcionais. No macOS, no entanto, a conexão via cabo direto **USB-C para USB-C** ainda está em fase de testes e apresenta **congelamento completo do sistema (*hard freeze*)** no momento em que o cabo é conectado com o sistema ligado (*hotplug*).
+* **Diagnóstico Técnico:**
+  1. Conexões diretas **USB-C para USB-C** transmitem simultaneamente sinal de vídeo (DisplayPort Alt Mode), dados e alta potência de recarga (**USB Power Delivery**). No HP Elite c1030 (hardware Chromebook *Jinlon*), o chaveamento dessas linhas é controlado pelo chip **ChromeOS EC (Embedded Controller)**, que não possui um driver de comutação Type-C equivalente no macOS, o que pode causar conflito elétrico ou tempestades de interrupção ACPI.
+  2. Ajustes anteriores de Hackintosh desktop como `disable-agdc` ou `igfxonln=1` causavam conflitos no handshake de link training do DisplayPort.
+  3. A porta USB-C da esquerda apresentou vulnerabilidade a mau contato físico no conector em alguns testes, enquanto a porta da direita opera estável no Windows.
+* **Recomendações no Momento:**
+  * Para uso de monitor externo no macOS, recomenda-se provisoriamente o uso de **adaptadores dedicados Type-C para HDMI ou Type-C para DisplayPort** (que isolam a transmissão exclusivamente para vídeo, sem injeção simultânea de Power Delivery).
+  * O recurso segue em investigação ativa para refinamento dos buffers de vídeo e ACPI.
 
 ### 2. Desempenho e Fluidez de Animações (EPP 0x40)
 * No `CPUFriendDataProvider.kext`, o parâmetro **EPP (Energy Performance Preference)** foi configurado para **`0x40`** em todos os vetores de frequência. A CPU sobe o clock instantaneamente no início de animações (efeito Gênio, Mission Control e redimensionamento), eliminando engasgos visuais.
