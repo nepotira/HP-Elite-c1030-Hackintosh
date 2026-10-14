@@ -7,6 +7,16 @@ Consulte [`docs/REGRAS_DE_VERSIONAMENTO.md`](docs/REGRAS_DE_VERSIONAMENTO.md) pa
 
 ---
 
+## [v1.3.3] - 2026-10-14
+
+### Revertido / Corrigido
+- **`ERR-PWR-01` (Queda severa de desempenho e lentidão geral no macOS):**
+  - **Sintoma Relatado:** Desempenho geral do sistema ficou severamente comprometido, lento e engasgado após o boot da `v1.3.2`.
+  - **Causa Raiz Técnica:** A ativação de `forceRenderStandby=0` impediu a GPU integrada Intel UHD 630 de entrar no modo de baixo consumo RC6 (Render Standby). No processador Intel Comet Lake móvel (TDP nominal de 15W compartilhado entre CPU e GPU), manter a GPU constantemente energizada esgotou o orçamento térmico do pacote (*package power limit*), provocando estrangulamento (*throttling*) severo de clock da CPU. Além disso, o patch `igfxrpsc=1` travou o escalonamento dinâmico de estados de performance.
+  - **Correção:** Reversão imediata dos parâmetros de CPU/GPU nos `boot-args`, removendo `forceRenderStandby=0` e `igfxrpsc=1` e restaurando a configuração estável de desempenho nativo em `EFI/OC/config.plist` e na partição ativa `Y:\EFI\OC\config.plist`.
+
+---
+
 ## [v1.3.2] - 2026-10-14
 
 ### Corrigido
@@ -109,6 +119,7 @@ Consulte [`docs/REGRAS_DE_VERSIONAMENTO.md`](docs/REGRAS_DE_VERSIONAMENTO.md) pa
 
 | ID do Erro | Subsistema | Sintoma Relatado | Causa Raiz Técnica | Status | Versão Origem | Versão Correção |
 | :--- | :---: | :--- | :--- | :---: | :---: | :---: |
+| **`ERR-PWR-01`** | Desempenho / Energia | Queda severa de desempenho e lentidão geral no sistema. | `forceRenderStandby=0` saturava o TDP de 15W do pacote da CPU e `igfxrpsc=1` causava throttling severo de clock. | **Resolvido via Reversão** | `v1.3.2` | `v1.3.3` |
 | **`ERR-VID-01`** | Vídeo / Mídia | Vídeos em navegadores e players congelam no início ou param do nada. | Suspensão RC6 da iGPU em `VTDecoderXPCService` devido à ausência de `forceRenderStandby=0`, somada a flag DRM incompatível `unfairgva=1`. | **Resolvido** | `v1.1.0` | `v1.3.2` |
 | **`ERR-AUD-01`** | Áudio | Som picotando/flickando como repicado contínuo sem parar. | Stalls de agendamento na thread do `coreaudiod` causados pela latência de RC6 da iGPU, gerando *buffer underrun* e looping de leitura DMA no ring buffer de 16384 frames. | **Resolvido** | `v1.1.0` | `v1.3.2` |
 | **`ERR-DISP-01`** | Display / Hotplug | Kernel panic ou congelamento de tela ao plugar monitor USB-C. | Conflito de framebuffer com `igfxonln=1` e supressão de controle nativo do Apple Graphics Device Control (`igfxagdc=0`). | **Mitigado / Em Testes** | `v1.0.0` | `v1.3.1` |
