@@ -55,7 +55,7 @@ Se você acabou de comprar o Chromebook e ele ainda está com o ChromeOS de fáb
 | **Touchscreen** | ❌ Desativado por Segurança | Bloqueado propositalmente (`SSDT-NoTouch`) para evitar crash/congelamento no I2C |
 | **Indicador de Bateria & Status EC** | ✅ Funcionando | Integrado com `CrosEC.kext` + `SMCBatteryManager` |
 | **SSD NVMe (Western Digital)** | ✅ Funcionando | `NVMeFix.kext` ativo para estabilidade térmica e de energia |
-| **Reprodução de Vídeos (YouTube/Navegadores)** | ✅ Funcionando | Decodificação por hardware fluida (corrigido com remoção de `forceRenderStandby=0`) |
+| **Reprodução de Vídeos (YouTube/Navegadores)** | ✅ Funcionando | Decodificação por hardware fluida (estabilizado com `forceRenderStandby=0` e `igfxrpsc=1`) |
 | **Streaming com DRM (Netflix/Prime Video)** | ✅ Funcionando | FairPlay nativo 1080p no Safari e Widevine no Chrome (com `-amfipassbeta`) |
 | **Permissões do Sistema (TCC / WhatsApp)** | ✅ Funcionando | Pop-ups nativos de microfone/câmera liberados via `AMFIPass.kext` |
 | **Controles de Jogo (GameSir Nova Lite)** | ✅ Funcionando | Suporte completo via Dongle USB 2.4 GHz (XInput) com utilitários dedicados e Bluetooth nativo |
@@ -93,6 +93,13 @@ Para ativar o volume amplificado no macOS:
    sudo ./instalar_audio_boost.sh
    ```
 3. O script substituirá o plugin HAL em `/Library/Audio/Plug-Ins/HAL/` e reiniciará o serviço de áudio. Pronto!
+
+### 🛠️ Estabilização de Clock e Correção de Picotamento / Repicado (`ERR-AUD-01`):
+Se o áudio apresentar estalos, engasgos rápidos ou repetição em loop contínuo ("repicado"), isso decorre de descompasso de clock entre a amostragem do macOS e o DSP do hardware. **Não é necessário diminuir o volume.** Execute o utilitário de otimização de buffers:
+```bash
+sudo ./tools/audio/otimizar_audio.sh
+```
+* **Dica Pro:** No app **Configuração de Áudio e MIDI** (`Audio MIDI Setup`), certifique-se de que a saída do **CmlSOFAudio Device** está fixada em **48.000 Hz** (frequência nativa do DSP Intel Comet Lake), eliminando conversões em tempo real.
 
 ---
 
@@ -144,8 +151,8 @@ Existem 5 razões reais de engenharia pelas quais o macOS ganha tanta fluidez co
   2. Patch ACPI renomeando o `_CID` `PNP0C50` para `XNP0C50`.
   3. `SSDT-NoTouch.aml` forçando `_STA = 0` no macOS. A tela de toque fica desativada no macOS com total segurança, mantendo o trackpad 100% funcional.
 
-### 4. Correções de Vídeo por Hardware, Permissões TCC e DRM (v1.1.0)
-* **Destravamento de Vídeos (YouTube/Navegadores):** A remoção do argumento `forceRenderStandby=0` permitiu que a Intel UHD 630 alterne seus estados de energia RC6 durante a reprodução de mídia, eliminando o congelamento silencioso do serviço `VTDecoderXPCService`.
+### 4. Correções de Vídeo por Hardware, Permissões TCC e DRM (v1.3.2)
+* **Estabilização de Vídeos (`ERR-VID-01`):** A Intel UHD 630 (Comet Lake) entrava em estado de economia de energia profundo (RC6 / Render Standby) durante as transições de quadros no serviço de decodificação de hardware (`VTDecoderXPCService`). Sem o argumento `forceRenderStandby=0`, a GPU demorava a responder às interrupções de hardware, gerando *ring timeouts* e fazendo os vídeos travarem no início ou pararem do nada no YouTube e navegadores. Na versão **v1.3.2**, restauramos `forceRenderStandby=0`, ativamos o patch de performance `igfxrpsc=1` e removemos `unfairgva=1` (que era voltado apenas para GPUs dedicadas AMD e causava desvio incorreto nas chamadas de DRM da iGPU).
 * **Permissões do Sistema (WhatsApp/Microfone/Câmera):** A remoção da antiga marreta `amfi=0x80` e a transição para o **`AMFIPass.kext`** com o argumento **`-amfipassbeta`** restaurou os pop-ups nativos de autorização do macOS, permitindo que o WhatsApp acesse o microfone normalmente.
 * **Aceleração DRM (Netflix/Prime Video):** Com o AMFI mantido de forma compatível via `AMFIPass`, a biblioteca Widevine do Google Chrome (`libwidevinecdm.dylib`) carrega com validação íntegra, permitindo a reprodução de streamings protegidos por direitos autorais. No Safari, o streaming roda via **Apple FairPlay nativo por hardware**.
 * **Por que NÃO usar o Intel GuC Firmware (`igfxfw=2`):** O firmware Coreboot / MrChromebox não implementa os canais de autenticação proprietários da Intel MEI (*Management Engine*). Tentar forçar o carregamento do GuC via `igfxfw=2` faz o driver `AppleIntelKBLGraphics` entrar em loop de espera infinito (*hardware timeout*), travando o boot na barra da maçã.
@@ -157,8 +164,8 @@ O **GameSir Nova Lite** é o controle ideal para o HP Elite c1030, oferecendo co
 Para quem joga no **Xbox Cloud Gaming (xCloud)** e busca a menor latência possível sem depender de Bluetooth:
 1. **O Cenário:** O dongle do GameSir opera em modo XInput padrão de fábrica (`Home + X`, LED verde). Navegadores baseados em Chromium no macOS necessitam de uma ponte/driver para mapear dispositivos XInput via USB.
 2. **Como ter GameSir com Dongle E Netflix funcionando ao mesmo tempo:**
-   * **Cenário A (Prático e Imediato):** Com o perfil de bypass da EFI (`amfi_get_out_of_my_way=1`), você joga no **Google Chrome com o Dongle USB 2.4 GHz** com resposta imediata. Para assistir à **Netflix**, basta abrir o **Safari**! O Safari não depende do módulo Widevine do Chrome; ele utiliza o decodificador nativo da Apple por hardware (**Apple FairPlay** acelerado pela Intel UHD 630 com `unfairgva=1`), reproduzindo em **1080p Full HD** sem nenhum conflito!
-   * **Cenário B (Tudo no Google Chrome com Assinatura Ad-Hoc):** Se você prefere assistir à Netflix dentro do Chrome, mantenha a EFI Padrão v1.1.2 e utilize o utilitário **`setup_gamesir_dongle.command`** da pasta `tools/gamesir_nova_lite/`. O script assina a ponte de controle localmente (`codesign --force --deep --sign -`), fazendo o macOS confiar no programa com o AMFI ativo!
+   * **Cenário A (Prático e Imediato):** Com o perfil de bypass da EFI (`amfi_get_out_of_my_way=1`), você joga no **Google Chrome com o Dongle USB 2.4 GHz** com resposta imediata. Para assistir à **Netflix**, basta abrir o **Safari**! O Safari não depende do módulo Widevine do Chrome; ele utiliza o decodificador nativo da Apple por hardware (**Apple FairPlay** acelerado pela Intel UHD 630), reproduzindo em **1080p Full HD** sem nenhum conflito!
+   * **Cenário B (Tudo no Google Chrome com Assinatura Ad-Hoc):** Se você prefere assistir à Netflix dentro do Chrome, mantenha a EFI Padrão v1.3.2 e utilize o utilitário **`setup_gamesir_dongle.command`** da pasta `tools/gamesir_nova_lite/`. O script assina a ponte de controle localmente (`codesign --force --deep --sign -`), fazendo o macOS confiar no programa com o AMFI ativo!
    * **Cenário C (Alternador de Perfis de EFI no Windows):** Incluímos o script **`ALTERNAR_EFI.bat`** para quem usa dual-boot com Windows poder alternar entre o perfil Padrão e o perfil XInput com apenas 1 clique.
 3. 👉 **[Acesse o Pacote de Ferramentas e Instruções do GameSir](tools/gamesir_nova_lite/README.md)** na pasta `tools/gamesir_nova_lite/`.
 
@@ -180,7 +187,7 @@ Com o utilitário customizado na pasta **`tools/hidpi`**:
 ## 📖 Como Usar a EFI
 
 ### Opção 1: Baixar a Release Pronta (Recomendado)
-1. Vá na aba **[Releases](https://github.com/nepotira/HP-Elite-c1030-Hackintosh/releases/latest)** e baixe o arquivo **`EFI-HP-Elite-c1030-v1.1.3.zip`**.
+1. Vá na aba **[Releases](https://github.com/nepotira/HP-Elite-c1030-Hackintosh/releases/latest)** e baixe o arquivo **`EFI-HP-Elite-c1030-v1.3.2.zip`**.
 2. Extraia o arquivo zip.
 3. Copie a pasta `EFI` para a partição EFI (FAT32) do seu SSD ou pendrive bootável.
 
@@ -246,18 +253,20 @@ Como o layout de teclado físico do Chromebook HP Elite c1030 difere do teclado 
 
 ---
 
-## 📦 Arquivos para Download (Release v1.1.3 Oficial)
+## 📦 Arquivos para Download (Release v1.3.2 Oficial)
 
-Todos os arquivos necessários para rodar o macOS com 100% dos recursos configurados estão disponíveis diretamente na página de **[Releases](https://github.com/nepotira/HP-Elite-c1030-Hackintosh/releases/tag/v1.1.3)**:
+Todos os arquivos necessários para rodar o macOS com 100% dos recursos configurados estão disponíveis diretamente na página de **[Releases](https://github.com/nepotira/HP-Elite-c1030-Hackintosh/releases/tag/v1.3.2)**:
 
 | Arquivo | Tamanho | Descrição | Download Direto |
 | :--- | :---: | :--- | :---: |
-| **`EFI-HP-Elite-c1030-v1.1.3.zip`** | 68.9 MB | Pasta EFI completa (`BOOT` + `OC`) pronta para copiar na partição EFI | [Baixar EFI](https://github.com/nepotira/HP-Elite-c1030-Hackintosh/releases/download/v1.1.3/EFI-HP-Elite-c1030-v1.1.3.zip) |
-| **`HiDPI-3x2-HP-Elite-c1030.zip`** | 269 KB | Pacote de injeção de resoluções HiDPI (Retina) sob medida para a tela 3:2 (125%, 1536×1024) | [Baixar Pacote HiDPI 3:2](https://github.com/nepotira/HP-Elite-c1030-Hackintosh/releases/download/v1.1.3/HiDPI-3x2-HP-Elite-c1030.zip) |
-| **`Audio-Boost-HP-Elite-c1030.zip`** | 13.9 KB | Instalador do driver de áudio HAL com 100% de volume alto nativo | [Baixar Audio Boost](https://github.com/nepotira/HP-Elite-c1030-Hackintosh/releases/download/v1.1.3/Audio-Boost-HP-Elite-c1030.zip) |
-| **`GameSir-Nova-Lite-Mac-Tool.zip`** | 28.7 KB | Utilitários, scripts de assinatura Ad-Hoc e alternador de perfil EFI para Dongle USB 2.4 GHz | [Baixar Ferramentas GameSir](https://github.com/nepotira/HP-Elite-c1030-Hackintosh/releases/download/v1.1.3/GameSir-Nova-Lite-Mac-Tool.zip) |
-| **`HeliPort.dmg`** | 8.2 MB | Aplicativo oficial para gerenciamento e conexão do Wi-Fi Intel | [Baixar HeliPort](https://github.com/nepotira/HP-Elite-c1030-Hackintosh/releases/download/v1.1.3/HeliPort.dmg) |
+| **`EFI-HP-Elite-c1030-v1.3.2.zip`** | 68.9 MB | Pasta EFI completa (`BOOT` + `OC`) pronta para copiar na partição EFI | [Baixar EFI](https://github.com/nepotira/HP-Elite-c1030-Hackintosh/releases/download/v1.3.2/EFI-HP-Elite-c1030-v1.3.2.zip) |
+| **`HiDPI-3x2-HP-Elite-c1030.zip`** | 269 KB | Pacote de injeção de resoluções HiDPI (Retina) sob medida para a tela 3:2 (125%, 1536×1024) | [Baixar Pacote HiDPI 3:2](https://github.com/nepotira/HP-Elite-c1030-Hackintosh/releases/download/v1.3.2/HiDPI-3x2-HP-Elite-c1030.zip) |
+| **`Audio-Boost-HP-Elite-c1030.zip`** | 13.9 KB | Instalador do driver de áudio HAL com 100% de volume alto nativo | [Baixar Audio Boost](https://github.com/nepotira/HP-Elite-c1030-Hackintosh/releases/download/v1.3.2/Audio-Boost-HP-Elite-c1030.zip) |
+| **`GameSir-Nova-Lite-Mac-Tool.zip`** | 28.7 KB | Utilitários, scripts de assinatura Ad-Hoc e alternador de perfil EFI para Dongle USB 2.4 GHz | [Baixar Ferramentas GameSir](https://github.com/nepotira/HP-Elite-c1030-Hackintosh/releases/download/v1.3.2/GameSir-Nova-Lite-Mac-Tool.zip) |
+| **`HeliPort.dmg`** | 8.2 MB | Aplicativo oficial para gerenciamento e conexão do Wi-Fi Intel | [Baixar HeliPort](https://github.com/nepotira/HP-Elite-c1030-Hackintosh/releases/download/v1.3.2/HeliPort.dmg) |
 
+> 📌 **Governança e Histórico de Erros:**  
+> Consulte as **[Regras de Versionamento Semântico](docs/REGRAS_DE_VERSIONAMENTO.md)** e o **[Changelog Oficial](CHANGELOG.md)** para visualizar o ciclo de vida completo de cada versão, erros reportados e resoluções técnicas detalhadas.
 
 ---
 
@@ -278,12 +287,13 @@ Este projeto é distribuído sob a **[Licença MIT](LICENSE)**.
 * **Repositório Base:** Este projeto é uma evolução direta do repositório pioneiro **[starsnwind/HP-Elite-C1030---x360-13c-Chromebook-Hackintosh](https://github.com/starsnwind/HP-Elite-C1030---x360-13c-Chromebook-Hackintosh)**.
 * **Base do Update macOS Tahoe:** A atualização inicial da EFI para suportar o macOS 26 Tahoe e o uso do driver `CmlSOFAudio` foram disponibilizadas publicamente pelo colaborador **Bantryred** através do Google Drive na [Issue #7 do repositório original](https://github.com/starsnwind/HP-Elite-C1030---x360-13c-Chromebook-Hackintosh/issues/7).
 * **Desenvolvimento e Refinamentos (nepotira):**
-  - Engenharia reversa e criação do ganho nativo de volume 100% no HAL (`audio_boost`).
+  - Engenharia reversa e criação do ganho nativo de volume 100% no HAL (`audio_boost`) e ferramenta de estabilização de clock (`tools/audio/otimizar_audio.sh`).
   - Calibração de desempenho agressivo via `CPUFriend` (EPP `0x40`).
   - Otimização do framebuffer de vídeo da Intel UHD 630 e correção de congelamento nas portas USB-C com monitores externos.
-  - Correção de decodificação de vídeo (remoção do deadlock de `forceRenderStandby`).
+  - Correção definitiva de decodificação de vídeo (`forceRenderStandby=0`, `igfxrpsc=1` e remoção de `unfairgva=1`).
   - Remoção do bloqueio de AMFI para restauração das permissões de microfone/câmera e DRM Widevine.
   - Engenharia e injeção do pacote de resoluções HiDPI nativas 3:2 para o painel IPS 13.5" (1920×1280), adaptando a estrutura do projeto open-source `xzhih/one-key-hidpi` para o formato 3:2 e macOS 26 Tahoe / Sequoia.
+  - Formalização do sistema de versionamento SemVer 2.0.0, Conventional Commits e rastreamento de erros.
   - Criação da documentação completa, scripts automatizados e guias de migração.
 
 ### ⚖️ Disclaimer Legal:
