@@ -37,6 +37,35 @@ Se você acabou de comprar o Chromebook e ele ainda está com o ChromeOS de fáb
 
 ---
 
+## 📚 Documentação Completa (comece por aqui se você é novo)
+
+| Documento | Para quê |
+| :--- | :--- |
+| [`docs/GUIA_DO_ZERO_AO_MACOS.md`](docs/GUIA_DO_ZERO_AO_MACOS.md) | Do ChromeOS de fábrica até o macOS instalado, passo a passo |
+| [`docs/TROUBLESHOOTING.md`](docs/TROUBLESHOOTING.md) | Deu problema? Sintoma → causa → solução, recuperação de emergência e `boot-args` (o que usar e o que **não** usar) |
+| [`docs/HISTORICO_DO_PROJETO.md`](docs/HISTORICO_DO_PROJETO.md) | Toda a história do projeto, com o que funcionou, o que falhou e por quê |
+| [`CHANGELOG.md`](CHANGELOG.md) | O que mudou em cada versão e a tabela de erros conhecidos |
+| [`docs/REGRAS_DE_VERSIONAMENTO.md`](docs/REGRAS_DE_VERSIONAMENTO.md) | Como versionamos (SemVer) e registramos erros |
+| [`docs/BRIEFING_ANTIGRAVITY_MACOS.md`](docs/BRIEFING_ANTIGRAVITY_MACOS.md) · [`AGENTS.md`](AGENTS.md) | Para IAs/mantenedores continuarem o trabalho de onde paramos |
+| [`docs/DICAS_MIGRACAO_WINDOWS.md`](docs/DICAS_MIGRACAO_WINDOWS.md) | Atalhos e ferramentas para quem vem do Windows |
+
+---
+
+## 🚧 Problemas Conhecidos (em aberto)
+
+> Transparência total: estes itens **ainda não estão resolvidos**. O detalhamento técnico está em [`docs/TROUBLESHOOTING.md`](docs/TROUBLESHOOTING.md#problemas-abertos).
+
+| ID | Problema | O que sabemos |
+| :--- | :--- | :--- |
+| `ERR-VID-01` | Vídeos param ou não iniciam, às vezes | Causa não comprovada. A v1.3.2 tentou mexer em flags de GPU, piorou o desempenho e foi revertida |
+| `ERR-AUD-01` | Áudio picotando ("repicado") | O driver usa um buffer circular que pode "repetir" um trecho se o sistema atrasar. Gatilho não comprovado. **Não baixe o volume para mascarar** |
+| `ERR-DISP-02` | Flicker/ghosting após ativar a escala HiDPI | **Teste mais barato:** `sudo tools/hidpi/desativar_hidpi.sh` e reinicie. Se vídeo/áudio melhorarem, o HiDPI era o culpado |
+| `ERR-DISP-01` | Monitor USB-C → USB-C congela o macOS | Funciona no Windows. A porta esquerda tem mau contato físico neste exemplar. Teste um adaptador USB-C→HDMI |
+| `ERR-KBD-01` | Luz do teclado | **Impossível** no macOS (controlada só pelo ChromeOS EC) |
+| `ERR-TCH-01` | Touchscreen | **Desligado de propósito**: tocar na tela derruba o macOS |
+
+---
+
 ## 🚀 Status dos Recursos
 
 | Recurso | Status | Observações |
@@ -55,7 +84,8 @@ Se você acabou de comprar o Chromebook e ele ainda está com o ChromeOS de fáb
 | **Touchscreen** | ❌ Desativado por Segurança | Bloqueado propositalmente (`SSDT-NoTouch`) para evitar crash/congelamento no I2C |
 | **Indicador de Bateria & Status EC** | ✅ Funcionando | Integrado com `CrosEC.kext` + `SMCBatteryManager` |
 | **SSD NVMe (Western Digital)** | ✅ Funcionando | `NVMeFix.kext` ativo para estabilidade térmica e de energia |
-| **Reprodução de Vídeos (YouTube/Navegadores)** | 🟡 Em Investigação | Mantido gerenciamento térmico nativo da GPU para garantir 100% de fluidez da CPU/GPU |
+| **Reprodução de Vídeos (YouTube/Navegadores)** | 🟡 Instável (em investigação) | Pode parar/não iniciar de forma intermitente. Tentativa da v1.3.2 falhou e foi revertida. Veja [Problemas Conhecidos](#-problemas-conhecidos-em-aberto) |
+| **Áudio picotando ("repicado")** | 🟡 Intermitente (em investigação) | Estalos/repetição curta do som em alguns momentos. **Não se resolve baixando o volume.** Veja [Problemas Conhecidos](#-problemas-conhecidos-em-aberto) |
 | **Streaming com DRM (Netflix/Prime Video)** | ✅ Funcionando | FairPlay nativo 1080p no Safari e Widevine no Chrome (com `-amfipassbeta`) |
 | **Permissões do Sistema (TCC / WhatsApp)** | ✅ Funcionando | Pop-ups nativos de microfone/câmera liberados via `AMFIPass.kext` |
 | **Controles de Jogo (GameSir Nova Lite)** | ✅ Funcionando | Suporte completo via Dongle USB 2.4 GHz (XInput) com utilitários dedicados e Bluetooth nativo |
@@ -151,8 +181,8 @@ Existem 5 razões reais de engenharia pelas quais o macOS ganha tanta fluidez co
   2. Patch ACPI renomeando o `_CID` `PNP0C50` para `XNP0C50`.
   3. `SSDT-NoTouch.aml` forçando `_STA = 0` no macOS. A tela de toque fica desativada no macOS com total segurança, mantendo o trackpad 100% funcional.
 
-### 4. Correções de Vídeo por Hardware, Permissões TCC e DRM (v1.3.3)
-* **Reversão de CPU/GPU e Preservação de Performance (`ERR-PWR-01`):** Na versão v1.3.2, testamos o uso de `forceRenderStandby=0` e `igfxrpsc=1` para evitar suspensão da GPU em vídeos. No entanto, no processador Intel Core i5-10310U (TDP de 15W), manter os núcleos da GPU alimentados permanentemente esgotou o limite de energia do pacote (*power limit*), provocando queda severa de desempenho e lentidão geral (*throttling*). Na versão **v1.3.3**, revertemos imediatamente esses argumentos para a configuração estável anterior, restaurando 100% da fluidez nativa da máquina. A decodificação por hardware de vídeos segue sob investigação isolada sem comprometer a CPU/GPU.
+### 4. Permissões TCC, DRM e Reversão de Parâmetros de GPU (v1.3.4)
+* **Reversão de parâmetros de CPU/GPU (`ERR-PWR-01`):** a versão v1.3.2 testou `forceRenderStandby=0` e `igfxrpsc=1` (e removeu `unfairgva=1`) para tentar corrigir vídeos que travam e áudio que picota. O resultado foi **desempenho muito pior** e **nenhum dos dois problemas foi confirmado como resolvido**, então a **v1.3.3 reverteu tudo** para o estado da v1.3.1. A causa individual da lentidão **não foi isolada** (hipótese: `igfxrpsc=1`, ou interação com o HiDPI). Vídeo e áudio seguem **em investigação** — veja [Problemas Conhecidos](#-problemas-conhecidos-em-aberto) e [`docs/TROUBLESHOOTING.md`](docs/TROUBLESHOOTING.md).
 * **Permissões do Sistema (WhatsApp/Microfone/Câmera):** A remoção da antiga marreta `amfi=0x80` e a transição para o **`AMFIPass.kext`** com o argumento **`-amfipassbeta`** restaurou os pop-ups nativos de autorização do macOS, permitindo que o WhatsApp acesse o microfone normalmente.
 * **Aceleração DRM (Netflix/Prime Video):** Com o AMFI mantido de forma compatível via `AMFIPass`, a biblioteca Widevine do Google Chrome (`libwidevinecdm.dylib`) carrega com validação íntegra, permitindo a reprodução de streamings protegidos por direitos autorais. No Safari, o streaming roda via **Apple FairPlay nativo por hardware**.
 * **Por que NÃO usar o Intel GuC Firmware (`igfxfw=2`):** O firmware Coreboot / MrChromebox não implementa os canais de autenticação proprietários da Intel MEI (*Management Engine*). Tentar forçar o carregamento do GuC via `igfxfw=2` faz o driver `AppleIntelKBLGraphics` entrar em loop de espera infinito (*hardware timeout*), travando o boot na barra da maçã.
@@ -187,7 +217,7 @@ Com o utilitário customizado na pasta **`tools/hidpi`**:
 ## 📖 Como Usar a EFI
 
 ### Opção 1: Baixar a Release Pronta (Recomendado)
-1. Vá na aba **[Releases](https://github.com/nepotira/HP-Elite-c1030-Hackintosh/releases/latest)** e baixe o arquivo **`EFI-HP-Elite-c1030-v1.3.3.zip`**.
+1. Vá na aba **[Releases](https://github.com/nepotira/HP-Elite-c1030-Hackintosh/releases/latest)** e baixe o arquivo **`EFI-HP-Elite-c1030-v1.3.4.zip`**.
 2. Extraia o arquivo zip.
 3. Copie a pasta `EFI` para a partição EFI (FAT32) do seu SSD ou pendrive bootável.
 
@@ -253,17 +283,17 @@ Como o layout de teclado físico do Chromebook HP Elite c1030 difere do teclado 
 
 ---
 
-## 📦 Arquivos para Download (Release v1.3.3 Oficial)
+## 📦 Arquivos para Download (Release v1.3.4 Oficial)
 
-Todos os arquivos necessários para rodar o macOS com 100% dos recursos configurados estão disponíveis diretamente na página de **[Releases](https://github.com/nepotira/HP-Elite-c1030-Hackintosh/releases/tag/v1.3.3)**:
+Todos os arquivos necessários para rodar o macOS com 100% dos recursos configurados estão disponíveis diretamente na página de **[Releases](https://github.com/nepotira/HP-Elite-c1030-Hackintosh/releases/tag/v1.3.4)**:
 
 | Arquivo | Tamanho | Descrição | Download Direto |
 | :--- | :---: | :--- | :---: |
-| **`EFI-HP-Elite-c1030-v1.3.3.zip`** | 68.9 MB | Pasta EFI completa (`BOOT` + `OC`) pronta para copiar na partição EFI | [Baixar EFI](https://github.com/nepotira/HP-Elite-c1030-Hackintosh/releases/download/v1.3.3/EFI-HP-Elite-c1030-v1.3.3.zip) |
-| **`HiDPI-3x2-HP-Elite-c1030.zip`** | 269 KB | Pacote de injeção de resoluções HiDPI (Retina) sob medida para a tela 3:2 (125%, 1536×1024) | [Baixar Pacote HiDPI 3:2](https://github.com/nepotira/HP-Elite-c1030-Hackintosh/releases/download/v1.3.3/HiDPI-3x2-HP-Elite-c1030.zip) |
-| **`Audio-Boost-HP-Elite-c1030.zip`** | 13.9 KB | Instalador do driver de áudio HAL com 100% de volume alto nativo | [Baixar Audio Boost](https://github.com/nepotira/HP-Elite-c1030-Hackintosh/releases/download/v1.3.3/Audio-Boost-HP-Elite-c1030.zip) |
-| **`GameSir-Nova-Lite-Mac-Tool.zip`** | 28.7 KB | Utilitários, scripts de assinatura Ad-Hoc e alternador de perfil EFI para Dongle USB 2.4 GHz | [Baixar Ferramentas GameSir](https://github.com/nepotira/HP-Elite-c1030-Hackintosh/releases/download/v1.3.3/GameSir-Nova-Lite-Mac-Tool.zip) |
-| **`HeliPort.dmg`** | 8.2 MB | Aplicativo oficial para gerenciamento e conexão do Wi-Fi Intel | [Baixar HeliPort](https://github.com/nepotira/HP-Elite-c1030-Hackintosh/releases/download/v1.3.3/HeliPort.dmg) |
+| **`EFI-HP-Elite-c1030-v1.3.4.zip`** | 68.9 MB | Pasta EFI completa (`BOOT` + `OC`) pronta para copiar na partição EFI | [Baixar EFI](https://github.com/nepotira/HP-Elite-c1030-Hackintosh/releases/download/v1.3.4/EFI-HP-Elite-c1030-v1.3.4.zip) |
+| **`HiDPI-3x2-HP-Elite-c1030.zip`** | 269 KB | Pacote de injeção de resoluções HiDPI (Retina) sob medida para a tela 3:2 (125%, 1536×1024) | [Baixar Pacote HiDPI 3:2](https://github.com/nepotira/HP-Elite-c1030-Hackintosh/releases/download/v1.3.4/HiDPI-3x2-HP-Elite-c1030.zip) |
+| **`Audio-Boost-HP-Elite-c1030.zip`** | 13.9 KB | Instalador do driver de áudio HAL com 100% de volume alto nativo | [Baixar Audio Boost](https://github.com/nepotira/HP-Elite-c1030-Hackintosh/releases/download/v1.3.4/Audio-Boost-HP-Elite-c1030.zip) |
+| **`GameSir-Nova-Lite-Mac-Tool.zip`** | 28.7 KB | Utilitários, scripts de assinatura Ad-Hoc e alternador de perfil EFI para Dongle USB 2.4 GHz | [Baixar Ferramentas GameSir](https://github.com/nepotira/HP-Elite-c1030-Hackintosh/releases/download/v1.3.4/GameSir-Nova-Lite-Mac-Tool.zip) |
+| **`HeliPort.dmg`** | 8.2 MB | Aplicativo oficial para gerenciamento e conexão do Wi-Fi Intel | [Baixar HeliPort](https://github.com/nepotira/HP-Elite-c1030-Hackintosh/releases/download/v1.3.4/HeliPort.dmg) |
 
 > 📌 **Governança e Histórico de Erros:**  
 > Consulte as **[Regras de Versionamento Semântico](docs/REGRAS_DE_VERSIONAMENTO.md)** e o **[Changelog Oficial](CHANGELOG.md)** para visualizar o ciclo de vida completo de cada versão, erros reportados e resoluções técnicas detalhadas.

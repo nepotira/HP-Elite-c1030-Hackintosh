@@ -108,3 +108,15 @@ Antes de declarar uma tarefa concluída:
 - [ ] O `README.md` teve suas referências de versão e links de download atualizados?
 - [ ] O commit foi criado com mensagem padronizada (Conventional Commits)?
 - [ ] A tag Git (`vX.Y.Z`) foi gerada e enviada ao repositório remoto?
+
+---
+
+## 6. Regras Adicionais (aprendidas em out/2026)
+
+1. **Hipótese não é causa raiz.** No `CHANGELOG.md` e nos commits, rotule como 🔶 *hipótese* tudo o que não foi comprovado. Só marque **Resolvido** quando o **dono confirmar no hardware**. (A v1.3.2 foi publicada como "resolvida" sem confirmação e precisou ser revertida na v1.3.3.)
+2. **Uma mudança de comportamento por versão.** Nunca combine várias flags de GPU/CPU no mesmo teste; assim a reversão e o diagnóstico são possíveis.
+3. **Reversão é uma versão.** Reverter uma tentativa fracassada gera um novo PATCH (ex.: v1.3.3 reverte a v1.3.2); **não** reescreva nem apague tags públicas.
+4. **Release só existe se tiver arquivos.** Antes de linkar downloads no `README.md`, publique a release e confira pela API: `https://api.github.com/repos/nepotira/HP-Elite-c1030-Hackintosh/releases` (nome do arquivo, tamanho > 0).
+5. **Segredos nunca entram no Git:** senhas de Wi-Fi, seriais/MLB/ROM reais, tokens. Credenciais de Wi-Fi do `itlwm.kext` ficam apenas na EFI local.
+6. **Mudança só de documentação = PATCH** (ex.: v1.3.4). Informe no changelog que a EFI não mudou.
+7. **Ao concluir, atualize o histórico:** novos fatos relevantes vão para `docs/HISTORICO_DO_PROJETO.md` e, se forem problemas, para `docs/TROUBLESHOOTING.md`.
